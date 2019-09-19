@@ -90,7 +90,9 @@ with open(args.output, 'w') as fout:
                                 
                 # fout.write('>>' + str(w) + '\n')
                 fout.write(str(temp_str) + ',\n')
-
+            fout.write('};\n')
+            fout.write('std::vector<std::vector<float> > layer' + str(ind) + '_' + l['class_name'] + '_Bias = {')
+            
             temp_str = list(model.layers[ind].get_weights()[1])
             temp_str = str(temp_str).replace("[", "{")
             temp_str = str(temp_str).replace("]", "}")
