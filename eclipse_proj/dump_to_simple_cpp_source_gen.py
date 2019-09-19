@@ -32,7 +32,7 @@ with CustomObjectScope({'GlorotUniform': glorot_uniform()}):
     arch = json.loads(arch)
 
 with open(args.output, 'w') as fout:
-    fout.write('layers ' + str(len(model.layers)) + '\n')
+    fout.write('// layers ' + str(len(model.layers)) + '\n')
 
     layers = []
     fout.write("#include <vector>\n\n")
