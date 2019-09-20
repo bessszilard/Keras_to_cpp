@@ -8,10 +8,11 @@
 
 #include <iostream>
 #include <fstream>
-#include "dumped.h"
-#include "Matrix.h"
 #include <math.h>
 #include <time.h>
+#include "NnLayer.h"
+#include "dumped.h"
+#include "Matrix.h"
 
 //using namespace std;
 using std::cout;
@@ -46,13 +47,18 @@ int main() {
 	clkExecuition.start = clock();
 
 	clkInit.start = clkExecuition.start; //clock();
-	Matrix<float> layer1W(layer1DenseWeights);
-	Matrix<float> layer3W(layer3DenseWeights);
-	Matrix<float> layer5W(layer5DenseWeights);
 
-	Matrix<float> layer1D(layer1DenseBias);
-	Matrix<float> layer3D(layer3DenseBias);
-	Matrix<float> layer5D(layer5DenseBias);
+	NnLayer layer1(layer1DenseWeights, layer1DenseBias, "relu"    );
+	NnLayer layer3(layer3DenseWeights, layer3DenseBias, "relu" 	  );
+	NnLayer layer5(layer5DenseWeights, layer5DenseBias, "softmax" );
+
+//	Matrix<float> layer1W(layer1DenseWeights);
+//	Matrix<float> layer3W(layer3DenseWeights);
+//	Matrix<float> layer5W(layer5DenseWeights);
+//
+//	Matrix<float> layer1D(layer1DenseBias);
+//	Matrix<float> layer3D(layer3DenseBias);
+//	Matrix<float> layer5D(layer5DenseBias);
 	clkInit.end = clock();
 
 	clkFileRead.start = clkInit.end;
@@ -62,12 +68,18 @@ int main() {
 
 	clkCaclOut.start = clkFileRead.end;
 	Matrix<float> flat = Flatten(input);
-	Matrix<float> layer1_Out = layer1W.transpose() * flat + layer1D.transpose();
-	Matrix<float> layer2_Out = relu_activation(layer1_Out);
-	Matrix<float> layer3_Out = layer3W.transpose() * layer2_Out + layer3D.transpose();
-	Matrix<float> layer4_Out = relu_activation(layer3_Out);
-	Matrix<float> layer5_Out = layer5W.transpose() * layer4_Out + layer5D.transpose();
-	Matrix<float> layer6_Out = softmax_activation(layer5_Out);
+//	Matrix<float> layer1_Out = layer1W.transpose() * flat + layer1D.transpose();
+//	Matrix<float> layer2_Out = layer1.get_output(flat);
+//	Matrix<float> layer2_Out = relu_activation(layer1_Out);
+//	Matrix<float> layer3_Out = layer3W.transpose() * layer2_Out + layer3D.transpose();
+//	Matrix<float> layer4_Out = relu_activation(layer3_Out);
+//	Matrix<float> layer5_Out = layer5W.transpose() * layer4_Out + layer5D.transpose();
+//	Matrix<float> layer6_Out = softmax_activation(layer5_Out);
+
+	Matrix<float> layer2_Out = layer1.get_output(flat);
+	Matrix<float> layer4_Out = layer3.get_output(layer2_Out);
+	Matrix<float> layer6_Out = layer5.get_output(layer4_Out);
+
 	clkCaclOut.end = clock();
 
 	cout << layer6_Out.transpose() << endl;
@@ -100,6 +112,8 @@ void read_from_file(const std::string &fname) {
 
 	int m_depth, m_rows, m_cols;
 	ifstream fin(fname.c_str());
+	if(fin.fail())
+		throw std::invalid_argument( "can't open " + fname);
 	fin >> m_depth >> m_rows >> m_cols;
 
 	for (int d = 0; d < m_depth; ++d) {
