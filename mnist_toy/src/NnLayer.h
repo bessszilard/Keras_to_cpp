@@ -24,12 +24,16 @@ private:
 
 public:
 	NnLayer(const std::vector<std::vector<float> > &weights, const  std::vector<std::vector<float> > &bias, const std::string &a_type);
-	Matrix<float> get_output(const Matrix<float> &input);
+	virtual Matrix<float> get_output(const Matrix<float> &input);
 	virtual ~NnLayer();
 };
 
-class Flatten : public NnLayer {
-
-};
+//class Flatten : public NnLayer {
+//
+//};
+//
+//class Dense   : public NnLayer {
+//
+//};
 
 #endif /* NNLAYER_H_ */

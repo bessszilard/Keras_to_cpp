@@ -52,13 +52,6 @@ int main() {
 	NnLayer layer3(layer3DenseWeights, layer3DenseBias, "relu" 	  );
 	NnLayer layer5(layer5DenseWeights, layer5DenseBias, "softmax" );
 
-//	Matrix<float> layer1W(layer1DenseWeights);
-//	Matrix<float> layer3W(layer3DenseWeights);
-//	Matrix<float> layer5W(layer5DenseWeights);
-//
-//	Matrix<float> layer1D(layer1DenseBias);
-//	Matrix<float> layer3D(layer3DenseBias);
-//	Matrix<float> layer5D(layer5DenseBias);
 	clkInit.end = clock();
 
 	clkFileRead.start = clkInit.end;
@@ -68,14 +61,6 @@ int main() {
 
 	clkCaclOut.start = clkFileRead.end;
 	Matrix<float> flat = Flatten(input);
-//	Matrix<float> layer1_Out = layer1W.transpose() * flat + layer1D.transpose();
-//	Matrix<float> layer2_Out = layer1.get_output(flat);
-//	Matrix<float> layer2_Out = relu_activation(layer1_Out);
-//	Matrix<float> layer3_Out = layer3W.transpose() * layer2_Out + layer3D.transpose();
-//	Matrix<float> layer4_Out = relu_activation(layer3_Out);
-//	Matrix<float> layer5_Out = layer5W.transpose() * layer4_Out + layer5D.transpose();
-//	Matrix<float> layer6_Out = softmax_activation(layer5_Out);
-
 	Matrix<float> layer2_Out = layer1.get_output(flat);
 	Matrix<float> layer4_Out = layer3.get_output(layer2_Out);
 	Matrix<float> layer6_Out = layer5.get_output(layer4_Out);
@@ -90,8 +75,6 @@ int main() {
 	cout << "Calc out:       " << getms(clkCaclOut)		<< " [ms]\t" << getpercent(clkCaclOut  , clkExecuition) << "%"<< endl;
 	cout << "Execution time: " << getms(clkExecuition)	<< " [ms]" << endl;
 
-//	cout << endl << "Execution time: ";
-//	cout << ((double) (clock() - tStart) * 1000 / CLOCKS_PER_SEC) << "[ms]" << endl;
 	return 0;
 }
 
@@ -141,35 +124,3 @@ Matrix<float> Flatten(const Matrix<float> &input) {
 	return flat;
 }
 
-
-Matrix<float> relu_activation(const Matrix<float> &input) {
-	if(input.getWidth() != 1)
-		throw std::invalid_argument("This is not a column vector L185");
-
-	int orig_row = input.getHeight();
-	Matrix<float> result(orig_row, 1);
-	for(int i = 0; i < orig_row; ++i) {
-		float temp = input.get(i, 0);
-		if (temp < 0)
-			temp = 0;
-		result.put(i, 0, temp);
-	}
-	return result;
-}
-
-Matrix<float> softmax_activation(const Matrix<float> &input) {
-	float sum = 0.0;
-	if(input.getWidth() != 1)
-		throw std::invalid_argument("This is not a column vector");
-
-	int orig_row = input.getHeight();
-	Matrix<float> result(orig_row, 1);
-
-	for(int k = 0; k < orig_row; ++k) {
-	  float temp = exp(input.get(k, 0));
-	  result.put(k, 0, temp);
-	  sum += temp;
-	}
-	result /= sum;
-	return result;
-}
