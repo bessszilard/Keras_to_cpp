@@ -1,4 +1,4 @@
-layers 4
+layers 2
 layer 0 Flatten
 layer 1 Dense
 784 64

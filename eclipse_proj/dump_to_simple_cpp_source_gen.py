@@ -44,7 +44,7 @@ with open(args.output, 'w') as fout:
         #     continue
 
         # fout.write('layer ' + str(ind) + ' ' + l['class_name'] + '\n')
-        fout.write('std::vector<std::vector<float> > layer' + str(ind) + '_' + l['class_name'])
+        fout.write('std::vector<std::vector<float> > layer' + str(ind) + l['class_name'])
 
         if args.verbose:
             print( str(ind), l['class_name'])
@@ -82,7 +82,7 @@ with open(args.output, 'w') as fout:
                 print(W.shape)
             # fout.write(str(W.shape[0]) + ' ' + str(W.shape[1]) + '\n')
             
-            fout.write(' = \n{\n')
+            fout.write('Weights = \n{\n')
             for w in W:
                 temp_str = list(w)
                 temp_str = str(temp_str).replace("[", "{")
@@ -91,7 +91,7 @@ with open(args.output, 'w') as fout:
                 # fout.write('>>' + str(w) + '\n')
                 fout.write(str(temp_str) + ',\n')
             fout.write('};\n')
-            fout.write('std::vector<std::vector<float> > layer' + str(ind) + '_' + l['class_name'] + '_Bias = {')
+            fout.write('std::vector<std::vector<float> > layer' + str(ind) + l['class_name'] + 'Bias = {')
             
             temp_str = list(model.layers[ind].get_weights()[1])
             temp_str = str(temp_str).replace("[", "{")
