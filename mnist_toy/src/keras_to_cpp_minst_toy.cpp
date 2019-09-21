@@ -24,7 +24,7 @@ std::vector<std::vector<std::vector<float> > > data; // depth, rows, cols
 
 vector<float> read_1d_array(ifstream &fin, int cols);
 void read_from_file(const std::string &fname);
-Matrix<float> Flatten(const Matrix<float> &input);
+Matrix<float> Flatten_func(const Matrix<float> &input);
 Matrix<float> relu_activation(const Matrix<float> &input);
 Matrix<float> softmax_activation(const Matrix<float> &input);
 
@@ -48,9 +48,10 @@ int main() {
 
 	clkInit.start = clkExecuition.start; //clock();
 
-	NnLayer layer1(layer1DenseWeights, layer1DenseBias, "relu"    );
-	NnLayer layer3(layer3DenseWeights, layer3DenseBias, "relu" 	  );
-	NnLayer layer5(layer5DenseWeights, layer5DenseBias, "softmax" );
+	Flatten layer0(1);
+	Dense layer1(layer1DenseWeights, layer1DenseBias, "relu"    );
+	Dense layer3(layer3DenseWeights, layer3DenseBias, "relu" 	);
+	Dense layer5(layer5DenseWeights, layer5DenseBias, "softmax" );
 
 	clkInit.end = clock();
 
@@ -60,7 +61,7 @@ int main() {
 	clkFileRead.end = clock();
 
 	clkCaclOut.start = clkFileRead.end;
-	Matrix<float> flat = Flatten(input);
+	Matrix<float> flat = layer0.get_output(input);//Flatten_func(input);
 	Matrix<float> layer2_Out = layer1.get_output(flat);
 	Matrix<float> layer4_Out = layer3.get_output(layer2_Out);
 	Matrix<float> layer6_Out = layer5.get_output(layer4_Out);
@@ -110,7 +111,7 @@ void read_from_file(const std::string &fname) {
 	fin.close();
 }
 
-Matrix<float> Flatten(const Matrix<float> &input) {
+Matrix<float> Flatten_func(const Matrix<float> &input) {
 	int orig_row = input.getHeight();
 	int orig_col = input.getWidth();
 	Matrix<float> flat(orig_row * orig_col, 1);

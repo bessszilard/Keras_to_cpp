@@ -8,8 +8,26 @@
 #include <math.h>
 #include "NnLayer.h"
 
+// Dense -----------------------------------------------------------------------------------------
+Flatten::Flatten(int x) {
+	std::cout << x << " Flatten constructor" << std::endl;
+}
+
+Matrix<float> Flatten::get_output(const Matrix<float> &input) {
+	int orig_row = input.getHeight();
+	int orig_col = input.getWidth();
+	Matrix<float> flat(orig_row * orig_col, 1);
+
+	for (int i = 0; i < orig_row; ++i) {
+		for (int j = 0; j < orig_col; ++j) {
+			int offset = (i * orig_col + j);
+			flat.put(offset, 0, input.get(i, j));
+		}
+	}
+	return flat;
+}
 // private ---------------------------------------------------------------------------------------
-Matrix<float> NnLayer::activation(const Matrix<float> &input) {
+Matrix<float> Dense::activation(const Matrix<float> &input) {
 	if(input.getWidth() != 1)
 		throw std::invalid_argument("Activation couldn't completed, because this is not a column vector");
 	int orig_row = input.getHeight();
@@ -40,9 +58,8 @@ Matrix<float> NnLayer::activation(const Matrix<float> &input) {
 }
 
 // public ---------------------------------------------------------------------------------------
-
 //NnLayer::NnLayer() {
-NnLayer::NnLayer(const std::vector<std::vector<float> > &weights,
+Dense::Dense(const std::vector<std::vector<float> > &weights,
 				 const std::vector<std::vector<float> > &bias,
 				 const std::string &a_type) :
 	m_weights(weights), m_bias(bias), m_activation_type(a_type)
@@ -50,12 +67,15 @@ NnLayer::NnLayer(const std::vector<std::vector<float> > &weights,
 	//TODO throw exception if bias width is larger than 0
 }
 
+Dense::~Dense() {
 
-
-NnLayer::~NnLayer() {
 }
 
-Matrix<float> NnLayer::get_output(const Matrix<float> &input) {
+NnLayer::~NnLayer() {
+
+}
+
+Matrix<float> Dense::get_output(const Matrix<float> &input) {
 	// TOOD check dimensions
 	return activation(m_weights.transpose() * input + m_bias.transpose());
 }
