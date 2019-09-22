@@ -8,25 +8,8 @@
 #include <math.h>
 #include "NnLayer.h"
 
-// Dense -----------------------------------------------------------------------------------------
-Flatten::Flatten(int x) {
-	std::cout << x << " Flatten constructor" << std::endl;
-}
-
-Matrix<float> Flatten::get_output(const Matrix<float> &input) {
-	int orig_row = input.getHeight();
-	int orig_col = input.getWidth();
-	Matrix<float> flat(orig_row * orig_col, 1);
-
-	for (int i = 0; i < orig_row; ++i) {
-		for (int j = 0; j < orig_col; ++j) {
-			int offset = (i * orig_col + j);
-			flat.put(offset, 0, input.get(i, j));
-		}
-	}
-	return flat;
-}
-// private ---------------------------------------------------------------------------------------
+// Dense ==========================================================================================
+// private ----------------------------------------------------------------------------------------
 Matrix<float> Dense::activation(const Matrix<float> &input) {
 	if(input.getWidth() != 1)
 		throw std::invalid_argument("Activation couldn't completed, because this is not a column vector");
@@ -66,17 +49,47 @@ Dense::Dense(const std::vector<std::vector<float> > &weights,
 {
 	//TODO throw exception if bias width is larger than 0
 }
-
-Dense::~Dense() {
-
-}
-
-NnLayer::~NnLayer() {
-
-}
+Dense::~Dense() {}
 
 Matrix<float> Dense::get_output(const Matrix<float> &input) {
 	// TOOD check dimensions
 	return activation(m_weights.transpose() * input + m_bias.transpose());
 }
+// Flatten ========================================================================================
+// public ---------------------------------------------------------------------------------------
+Flatten::Flatten(int x) {
+//	x++;
+	//TODO finish empty constructor
+}
+
+Matrix<float> Flatten::get_output(const Matrix<float> &input) {
+	int orig_row = input.getHeight();
+	int orig_col = input.getWidth();
+	Matrix<float> flat(orig_row * orig_col, 1);
+
+	for (int i = 0; i < orig_row; ++i) {
+		for (int j = 0; j < orig_col; ++j) {
+			int offset = (i * orig_col + j);
+			flat.put(offset, 0, input.get(i, j));
+		}
+	}
+	return flat;
+}
+
+// NeuralNetwork ==================================================================================
+void NeuralNetwork::add_layer(NnLayer *layer) {
+	layers.push_back(layer);
+}
+
+Matrix<float> NeuralNetwork::predict(const Matrix<float> &input) {
+	Matrix<float> temp = input;
+	for(auto layer : layers) {
+		temp = layer->get_output(temp);
+	}
+	return temp;
+}
+
+//NnLayer::~NnLayer() {
+//
+//}
 

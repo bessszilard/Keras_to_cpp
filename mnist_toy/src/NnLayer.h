@@ -10,6 +10,7 @@
 
 #include "Matrix.h"
 
+// NnLayer ========================================================================================
 class NnLayer {
 private:
 	int m_input_size;
@@ -21,9 +22,8 @@ private:
 
 public:
 	NnLayer() {};
-//	NnLayer(const std::vector<std::vector<float> > &weights, const  std::vector<std::vector<float> > &bias, const std::string &a_type);
 	virtual Matrix<float> get_output(const Matrix<float> &input) = 0;
-	virtual ~NnLayer();
+	virtual ~NnLayer() {}
 	int get_inputSize()  { return m_input_size;  }
 	int get_outputSize() { return m_output_size; }
 
@@ -31,6 +31,7 @@ public:
 	void set_outputSize(int size) { m_output_size = size; }
 };
 
+// Flatten ========================================================================================
 class Flatten : public NnLayer {
 public:
 	Flatten(int);
@@ -40,8 +41,6 @@ public:
 
 class Dense   : public NnLayer {
 private:
-//	int m_input_size;
-//	int m_output_size;
 	Matrix<float> m_weights;
 	Matrix<float> m_bias;
 	std::string m_activation_type;
@@ -53,9 +52,19 @@ public:
 	Dense(const std::vector<std::vector<float> > &weights, const  std::vector<std::vector<float> > &bias, const std::string &a_type);
 	virtual Matrix<float> get_output(const Matrix<float> &input);
 	virtual ~Dense();
-//	int get_inputSize()  { return m_input_size;  }
-//	int get_outputSize() { return m_output_size; }
+};
 
+// NnLayer ========================================================================================
+class NeuralNetwork {
+private:
+	std::vector<NnLayer*> layers;
+
+public:
+	NeuralNetwork(int x) {x++;};
+	virtual ~NeuralNetwork() {};
+
+	void add_layer(NnLayer *layer);
+	Matrix<float> predict(const Matrix<float> &input);
 };
 
 #endif /* NNLAYER_H_ */

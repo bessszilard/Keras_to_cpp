@@ -48,11 +48,16 @@ int main() {
 
 	clkInit.start = clkExecuition.start; //clock();
 
-	Flatten layer0(1);
-	Dense layer1(layer1DenseWeights, layer1DenseBias, "relu"    );
-	Dense layer3(layer3DenseWeights, layer3DenseBias, "relu" 	);
-	Dense layer5(layer5DenseWeights, layer5DenseBias, "softmax" );
+//	Flatten layer0(1);
+//	Dense layer1(layer1DenseWeights, layer1DenseBias, "relu"    );
+//	Dense layer3(layer3DenseWeights, layer3DenseBias, "relu" 	);
+//	Dense layer5(layer5DenseWeights, layer5DenseBias, "softmax" );
 
+	NeuralNetwork nn(1);
+	nn.add_layer(new Flatten(1));
+	nn.add_layer(new Dense(layer1DenseWeights, layer1DenseBias, "relu"		));
+	nn.add_layer(new Dense(layer3DenseWeights, layer3DenseBias, "relu" 		));
+	nn.add_layer(new Dense(layer5DenseWeights, layer5DenseBias, "softmax" 	));
 	clkInit.end = clock();
 
 	clkFileRead.start = clkInit.end;
@@ -61,10 +66,11 @@ int main() {
 	clkFileRead.end = clock();
 
 	clkCaclOut.start = clkFileRead.end;
-	Matrix<float> flat = layer0.get_output(input);//Flatten_func(input);
-	Matrix<float> layer2_Out = layer1.get_output(flat);
-	Matrix<float> layer4_Out = layer3.get_output(layer2_Out);
-	Matrix<float> layer6_Out = layer5.get_output(layer4_Out);
+//	Matrix<float> flat = layer0.get_output(input);//Flatten_func(input);
+//	Matrix<float> layer2_Out = layer1.get_output(flat);
+//	Matrix<float> layer4_Out = layer3.get_output(layer2_Out);
+//	Matrix<float> layer6_Out = layer5.get_output(layer4_Out);
+	Matrix<float> layer6_Out = nn.predict(input);
 
 	clkCaclOut.end = clock();
 
