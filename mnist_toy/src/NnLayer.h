@@ -34,7 +34,7 @@ public:
 // Flatten ========================================================================================
 class Flatten : public NnLayer {
 public:
-	Flatten(int);
+	Flatten() {};
 	virtual ~Flatten() {};
 	Matrix<float> get_output(const Matrix<float> &input);
 };
@@ -57,11 +57,11 @@ public:
 // NnLayer ========================================================================================
 class NeuralNetwork {
 private:
-	std::vector<NnLayer*> layers;
+	std::vector<NnLayer*> m_layers;
 
 public:
-	NeuralNetwork(int x) {x++;};
-	virtual ~NeuralNetwork() {};
+	NeuralNetwork() {}
+	virtual ~NeuralNetwork();
 
 	void add_layer(NnLayer *layer);
 	Matrix<float> predict(const Matrix<float> &input);

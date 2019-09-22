@@ -14,7 +14,6 @@
 #include "dumped.h"
 #include "Matrix.h"
 
-//using namespace std;
 using std::cout;
 using std::endl;
 using std::ifstream;
@@ -24,9 +23,6 @@ std::vector<std::vector<std::vector<float> > > data; // depth, rows, cols
 
 vector<float> read_1d_array(ifstream &fin, int cols);
 void read_from_file(const std::string &fname);
-Matrix<float> Flatten_func(const Matrix<float> &input);
-Matrix<float> relu_activation(const Matrix<float> &input);
-Matrix<float> softmax_activation(const Matrix<float> &input);
 
 struct clock_bounds {
 	clock_t start;
@@ -43,18 +39,11 @@ int getpercent(clock_bounds clk, clock_bounds overall) {
 
 int main() {
 	clock_bounds clkExecuition, clkInit, clkFileRead, clkCaclOut;
-
 	clkExecuition.start = clock();
-
 	clkInit.start = clkExecuition.start; //clock();
 
-//	Flatten layer0(1);
-//	Dense layer1(layer1DenseWeights, layer1DenseBias, "relu"    );
-//	Dense layer3(layer3DenseWeights, layer3DenseBias, "relu" 	);
-//	Dense layer5(layer5DenseWeights, layer5DenseBias, "softmax" );
-
-	NeuralNetwork nn(1);
-	nn.add_layer(new Flatten(1));
+	NeuralNetwork nn;
+	nn.add_layer(new Flatten());
 	nn.add_layer(new Dense(layer1DenseWeights, layer1DenseBias, "relu"		));
 	nn.add_layer(new Dense(layer3DenseWeights, layer3DenseBias, "relu" 		));
 	nn.add_layer(new Dense(layer5DenseWeights, layer5DenseBias, "softmax" 	));
@@ -66,12 +55,7 @@ int main() {
 	clkFileRead.end = clock();
 
 	clkCaclOut.start = clkFileRead.end;
-//	Matrix<float> flat = layer0.get_output(input);//Flatten_func(input);
-//	Matrix<float> layer2_Out = layer1.get_output(flat);
-//	Matrix<float> layer4_Out = layer3.get_output(layer2_Out);
-//	Matrix<float> layer6_Out = layer5.get_output(layer4_Out);
 	Matrix<float> layer6_Out = nn.predict(input);
-
 	clkCaclOut.end = clock();
 
 	cout << layer6_Out.transpose() << endl;
@@ -117,17 +101,17 @@ void read_from_file(const std::string &fname) {
 	fin.close();
 }
 
-Matrix<float> Flatten_func(const Matrix<float> &input) {
-	int orig_row = input.getHeight();
-	int orig_col = input.getWidth();
-	Matrix<float> flat(orig_row * orig_col, 1);
-
-	for(int i = 0; i < orig_row; ++i) {
-		for(int j = 0; j < orig_col; ++j) {
-			int offset = (i * orig_col + j);
-			flat.put(offset, 0, input.get(i, j));
-		}
-	}
-	return flat;
-}
+//Matrix<float> Flatten_func(const Matrix<float> &input) {
+//	int orig_row = input.getHeight();
+//	int orig_col = input.getWidth();
+//	Matrix<float> flat(orig_row * orig_col, 1);
+//
+//	for(int i = 0; i < orig_row; ++i) {
+//		for(int j = 0; j < orig_col; ++j) {
+//			int offset = (i * orig_col + j);
+//			flat.put(offset, 0, input.get(i, j));
+//		}
+//	}
+//	return flat;
+//}
 

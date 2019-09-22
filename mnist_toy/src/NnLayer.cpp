@@ -57,10 +57,10 @@ Matrix<float> Dense::get_output(const Matrix<float> &input) {
 }
 // Flatten ========================================================================================
 // public ---------------------------------------------------------------------------------------
-Flatten::Flatten(int x) {
-//	x++;
-	//TODO finish empty constructor
-}
+//Flatten::Flatten(int x) {
+////	x++;
+//	//TODO finish empty constructor
+//}
 
 Matrix<float> Flatten::get_output(const Matrix<float> &input) {
 	int orig_row = input.getHeight();
@@ -78,18 +78,20 @@ Matrix<float> Flatten::get_output(const Matrix<float> &input) {
 
 // NeuralNetwork ==================================================================================
 void NeuralNetwork::add_layer(NnLayer *layer) {
-	layers.push_back(layer);
+	m_layers.push_back(layer);
 }
 
 Matrix<float> NeuralNetwork::predict(const Matrix<float> &input) {
 	Matrix<float> temp = input;
-	for(auto layer : layers) {
+	for(auto layer : m_layers) {
 		temp = layer->get_output(temp);
 	}
 	return temp;
 }
 
-//NnLayer::~NnLayer() {
-//
-//}
+NeuralNetwork::~NeuralNetwork() {
+	for(int i = 0; i < (int)m_layers.size(); ++i) {
+		delete m_layers[i];
+	}
+}
 
