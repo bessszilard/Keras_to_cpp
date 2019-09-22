@@ -71,6 +71,7 @@ int main() {
 
 vector<float> read_1d_array(ifstream &fin, int cols) {
   vector<float> arr;
+  arr.reserve(cols);
   float tmp_float;
   char tmp_char;
   fin >> tmp_char;
@@ -89,6 +90,7 @@ void read_from_file(const std::string &fname) {
 	if(fin.fail())
 		throw std::invalid_argument( "can't open " + fname);
 	fin >> m_depth >> m_rows >> m_cols;
+	data.reserve(m_depth * m_rows * m_cols);
 
 	for (int d = 0; d < m_depth; ++d) {
 		vector < vector<float> > tmp_single_depth;
@@ -100,18 +102,3 @@ void read_from_file(const std::string &fname) {
 	}
 	fin.close();
 }
-
-//Matrix<float> Flatten_func(const Matrix<float> &input) {
-//	int orig_row = input.getHeight();
-//	int orig_col = input.getWidth();
-//	Matrix<float> flat(orig_row * orig_col, 1);
-//
-//	for(int i = 0; i < orig_row; ++i) {
-//		for(int j = 0; j < orig_col; ++j) {
-//			int offset = (i * orig_col + j);
-//			flat.put(offset, 0, input.get(i, j));
-//		}
-//	}
-//	return flat;
-//}
-

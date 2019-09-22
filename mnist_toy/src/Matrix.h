@@ -134,7 +134,7 @@ void Matrix<T>::put(int h, int w, const T &value) {
 }
 
 template<class T>
-T Matrix<T>::get(int h, int w) const {
+inline T Matrix<T>::get(int h, int w) const {
 	if (!(h >= 0 && h < height && w >= 0 && w < width))
 		throw std::invalid_argument("Index out of bounds.");
 

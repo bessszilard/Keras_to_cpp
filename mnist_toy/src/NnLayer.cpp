@@ -11,22 +11,12 @@
 
 // Dense ==========================================================================================
 // private ----------------------------------------------------------------------------------------
-Matrix<float> Dense::activation(const Matrix<float> &input) {
+Matrix<float> Dense::softmax(const Matrix<float> &input) {
 	if(input.getWidth() != 1)
 		throw std::invalid_argument("Activation couldn't completed, because this is not a column vector");
 	int orig_row = input.getHeight();
 	Matrix<float> result(orig_row, 1);
-
-/*	if(m_activation_type == "relu") {
-		for(int i = 0; i < orig_row; ++i) {
-			float temp = input.get(i, 0);
-			if (temp < 0)
-				temp = 0;
-			result.put(i, 0, temp);
-		}
-		return result;
-	}
-	else */if(m_activation_type == "softmax") {
+	if(m_activation_type == "softmax") {
 		float sum = 0.0;
 		for(int k = 0; k < orig_row; ++k) {
 		  float temp = exp(input.get(k, 0));
@@ -56,22 +46,20 @@ Matrix<float> Dense::get_output(const Matrix<float> &input) {
 	// TOOD check dimensions
 	Matrix<float> new_weights(m_bias.getWidth(), 1);
 	for (int i = 0; i < m_weights.getWidth(); ++i) {
-		for (int j = 0; j < input.getWidth(); ++j) {
-			float sum = 0.0f;
-			for (int k = 0; k < m_weights.getHeight(); ++k) {
-				sum += m_weights.get(k, i) * input.get(k, j);
-			}
-			sum += m_bias.get(0 , i);
-			if(m_activation_type == "relu") {
-				if(sum < 0)
-					sum = 0;
-			}
-			new_weights.put(i,j, sum + m_bias.get(0 , i));
+		float sum = 0.0f;
+		for (int k = 0; k < m_weights.getHeight(); ++k) {
+			sum += m_weights.get(k, i) * input.get(k, 0);
 		}
+		sum += m_bias.get(0, i);
+		if (m_activation_type == "relu") {
+			if (sum < 0)
+				sum = 0;
+		}
+		new_weights.put(i, 0, sum + m_bias.get(0, i));
 	}
-	if(m_activation_type == "relu")
+	if (m_activation_type == "relu")
 		return new_weights;
-	return activation(new_weights);// + m_bias.transpose());
+	return softmax(new_weights);
 }
 
 // Flatten ========================================================================================

@@ -46,7 +46,7 @@ private:
 	std::string m_activation_type;
 
 private:
-	Matrix<float> activation(const Matrix<float> &input);
+	Matrix<float> softmax(const Matrix<float> &input);
 
 public:
 	Dense(const std::vector<std::vector<float> > &weights, const  std::vector<std::vector<float> > &bias, const std::string &a_type);
