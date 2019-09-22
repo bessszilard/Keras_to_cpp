@@ -85,11 +85,10 @@ void NeuralNetwork::add_layer(NnLayer *layer) {
 
 Matrix<float> NeuralNetwork::predict(const Matrix<float> &input) {
 	Matrix<float> temp = input;
-	int x = 0;
 	for(auto layer : m_layers) {
-		clock_t start = clock();
+//		clock_t start = clock();
 		temp = layer->get_output(temp);
-		std::cout << x++ << " " << ((double) (clock() - start) * 1000 / CLOCKS_PER_SEC) << std:: endl;
+//		std::cout << x++ << " " << ((double) (clock() - start) * 1000 / CLOCKS_PER_SEC) << std:: endl;
 	}
 	return temp;
 }
