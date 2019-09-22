@@ -8,22 +8,24 @@
 #include <math.h>
 #include "NnLayer.h"
 #include <time.h>
+#include <stdexcept>
 
 // Dense ==========================================================================================
 // private ----------------------------------------------------------------------------------------
-Matrix<float> Dense::softmax(const Matrix<float> &input) {
-	if(input.getWidth() != 1)
+vector_2d Dense::softmax(const vector_2d &input) {
+	if(input[0].size() != 1)
 		throw std::invalid_argument("Activation couldn't completed, because this is not a column vector");
-	int orig_row = input.getHeight();
-	Matrix<float> result(orig_row, 1);
+	int orig_row = input.size();
+	vector_2d result(orig_row, float_vector(1));
 	if(m_activation_type == "softmax") {
 		float sum = 0.0;
 		for(int k = 0; k < orig_row; ++k) {
-		  float temp = exp(input.get(k, 0));
-		  result.put(k, 0, temp);
+		  float temp = exp(input[k][0]);
+		  result[k][0] = temp;
 		  sum += temp;
 		}
-		result /= sum;
+		for(int k = 0; k < orig_row; k++)
+			result[k][0] /= sum;
 		return result;
 	}
 	else {
@@ -42,20 +44,20 @@ Dense::Dense(const std::vector<std::vector<float> > &weights,
 }
 Dense::~Dense() {}
 
-Matrix<float> Dense::get_output(const Matrix<float> &input) {
+vector_2d Dense::get_output(const vector_2d &input) {
 	// TOOD check dimensions
-	Matrix<float> new_weights(m_bias.getWidth(), 1);
-	for (int i = 0; i < m_weights.getWidth(); ++i) {
+	vector_2d new_weights(m_bias[0].size(), float_vector(1));
+	for (size_t i = 0; i < m_weights[0].size(); ++i) {
 		float sum = 0.0f;
-		for (int k = 0; k < m_weights.getHeight(); ++k) {
-			sum += m_weights.get(k, i) * input.get(k, 0);
+		for (size_t k = 0; k < m_weights.size(); ++k) {
+			sum += m_weights[k][i] * input[k][0];
 		}
-		sum += m_bias.get(0, i);
+		sum += m_bias[0][i];
 		if (m_activation_type == "relu") {
 			if (sum < 0)
 				sum = 0;
 		}
-		new_weights.put(i, 0, sum + m_bias.get(0, i));
+		new_weights[i][0] = sum + m_bias[0][i];
 	}
 	if (m_activation_type == "relu")
 		return new_weights;
@@ -64,15 +66,15 @@ Matrix<float> Dense::get_output(const Matrix<float> &input) {
 
 // Flatten ========================================================================================
 // public ---------------------------------------------------------------------------------------
-Matrix<float> Flatten::get_output(const Matrix<float> &input) {
-	int orig_row = input.getHeight();
-	int orig_col = input.getWidth();
-	Matrix<float> flat(orig_row * orig_col, 1);
+vector_2d Flatten::get_output(const vector_2d &input) {
+	int orig_row = input.size();
+	int orig_col = input[0].size();
+	vector_2d flat(orig_row * orig_col, float_vector(1));
 
 	for (int i = 0; i < orig_row; ++i) {
 		for (int j = 0; j < orig_col; ++j) {
 			int offset = (i * orig_col + j);
-			flat.put(offset, 0, input.get(i, j));
+			flat[offset][0] = input[i][j];
 		}
 	}
 	return flat;
@@ -83,12 +85,10 @@ void NeuralNetwork::add_layer(NnLayer *layer) {
 	m_layers.push_back(layer);
 }
 
-Matrix<float> NeuralNetwork::predict(const Matrix<float> &input) {
-	Matrix<float> temp = input;
+vector_2d NeuralNetwork::predict(const vector_2d &input) {
+	vector_2d temp = input;
 	for(auto layer : m_layers) {
-//		clock_t start = clock();
 		temp = layer->get_output(temp);
-//		std::cout << x++ << " " << ((double) (clock() - start) * 1000 / CLOCKS_PER_SEC) << std:: endl;
 	}
 	return temp;
 }

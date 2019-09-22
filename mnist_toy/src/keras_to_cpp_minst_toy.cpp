@@ -12,7 +12,6 @@
 #include <time.h>
 #include "NnLayer.h"
 #include "dumped.h"
-#include "Matrix.h"
 
 using std::cout;
 using std::endl;
@@ -42,7 +41,7 @@ int main() {
 	float t_Init = 0;
 	float t_FileRead = 0;
 	float t_CalcOut = 0;
-	Matrix<float> result;
+	vector_2d result;
 	int iterations = 50;
 	for(int i = 0; i < iterations; i++) {
 		clock_bounds clkExecuition, clkInit, clkFileRead, clkCaclOut;
@@ -58,7 +57,7 @@ int main() {
 
 		clkFileRead.start = clkInit.end;
 		read_from_file("sample_mnist.dat");
-		Matrix<float> input(data[0]);
+		vector_2d input(data[0]);
 		clkFileRead.end = clock();
 
 		clkCaclOut.start = clkFileRead.end;
@@ -72,7 +71,9 @@ int main() {
 		t_execution += getms(clkExecuition) ;
 
 	}
-	cout << result.transpose() << endl;
+	for(size_t i = 0; i < result.size(); i++)
+		cout << result[i][0] << " ";
+	cout << endl;
 
 	cout << "Init:           " << t_Init      / iterations << " [ms]\t" << (int)(100 * (t_Init      / t_execution)) << "%"<< endl;
 	cout << "File read:      " << t_FileRead  / iterations << " [ms]\t" << (int)(100 * (t_FileRead  / t_execution)) << "%"<< endl;
