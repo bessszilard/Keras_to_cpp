@@ -7,6 +7,7 @@
 
 #include <math.h>
 #include "NnLayer.h"
+#include <time.h>
 
 // Dense ==========================================================================================
 // private ----------------------------------------------------------------------------------------
@@ -16,7 +17,7 @@ Matrix<float> Dense::activation(const Matrix<float> &input) {
 	int orig_row = input.getHeight();
 	Matrix<float> result(orig_row, 1);
 
-	if(m_activation_type == "relu") {
+/*	if(m_activation_type == "relu") {
 		for(int i = 0; i < orig_row; ++i) {
 			float temp = input.get(i, 0);
 			if (temp < 0)
@@ -25,7 +26,7 @@ Matrix<float> Dense::activation(const Matrix<float> &input) {
 		}
 		return result;
 	}
-	else if(m_activation_type == "softmax") {
+	else */if(m_activation_type == "softmax") {
 		float sum = 0.0;
 		for(int k = 0; k < orig_row; ++k) {
 		  float temp = exp(input.get(k, 0));
@@ -53,15 +54,28 @@ Dense::~Dense() {}
 
 Matrix<float> Dense::get_output(const Matrix<float> &input) {
 	// TOOD check dimensions
-	return activation(m_weights.transpose() * input + m_bias.transpose());
+	Matrix<float> new_weights(m_bias.getWidth(), 1);
+	for (int i = 0; i < m_weights.getWidth(); ++i) {
+		for (int j = 0; j < input.getWidth(); ++j) {
+			float sum = 0.0f;
+			for (int k = 0; k < m_weights.getHeight(); ++k) {
+				sum += m_weights.get(k, i) * input.get(k, j);
+			}
+			sum += m_bias.get(0 , i);
+			if(m_activation_type == "relu") {
+				if(sum < 0)
+					sum = 0;
+			}
+			new_weights.put(i,j, sum + m_bias.get(0 , i));
+		}
+	}
+	if(m_activation_type == "relu")
+		return new_weights;
+	return activation(new_weights);// + m_bias.transpose());
 }
+
 // Flatten ========================================================================================
 // public ---------------------------------------------------------------------------------------
-//Flatten::Flatten(int x) {
-////	x++;
-//	//TODO finish empty constructor
-//}
-
 Matrix<float> Flatten::get_output(const Matrix<float> &input) {
 	int orig_row = input.getHeight();
 	int orig_col = input.getWidth();
@@ -83,8 +97,11 @@ void NeuralNetwork::add_layer(NnLayer *layer) {
 
 Matrix<float> NeuralNetwork::predict(const Matrix<float> &input) {
 	Matrix<float> temp = input;
+	int x = 0;
 	for(auto layer : m_layers) {
+		clock_t start = clock();
 		temp = layer->get_output(temp);
+		std::cout << x++ << " " << ((double) (clock() - start) * 1000 / CLOCKS_PER_SEC) << std:: endl;
 	}
 	return temp;
 }

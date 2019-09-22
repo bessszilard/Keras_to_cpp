@@ -196,16 +196,14 @@ Matrix<T> Matrix<T>::subtract(const Matrix &m) const {
 
 template<class T>
 Matrix<T> Matrix<T>::multiply(const Matrix &m) const {
-//	if (!(height == m.height && width == m.width))
-//		throw std::invalid_argument("Matrix dimension must be the same. L200");
 	if (width != m.height)
 		throw std::invalid_argument("Matrix dimension must be the same. L200");
 
 	Matrix result(height, m.width);
 
-	for (int i = 0; i < height; i++) {
-		for (int j = 0; j < m.width; j++) {
-			for(int k = 0; k < width; ++k) {
+	for (int i = 0; i < height; ++i) {
+		for (int j = 0; j < m.width; ++j) {
+			for (int k = 0; k < width; ++k) {
 				result.array[i][j] += array[i][k] * m.array[k][j];
 			}
 		}
