@@ -12,7 +12,7 @@
 #include <vector>
 
 typedef std::vector<float>     vector_1d; // 1D
-typedef std::vector<std::vector<float> > vector_2d;
+typedef std::vector< vector_1d > vector_2d;
 
 // NnLayer ========================================================================================
 class NnLayer {
@@ -51,7 +51,7 @@ private:
 	std::string m_activation_type;
 
 private:
-	vector_2d softmax(const vector_2d &input);
+	vector_2d activaction(const vector_2d &input);
 //	void dotprodWithRelu(int col, const vector_2d &input, float &output);
 
 public:

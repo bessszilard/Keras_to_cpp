@@ -10,6 +10,7 @@
 #include <fstream>
 #include <math.h>
 #include <time.h>
+#include <algorithm>
 #include "NnLayer.h"
 #include "dumped.h"
 
@@ -72,6 +73,9 @@ int main() {
 		t_execution += getms(clkExecuition) ;
 
 	}
+
+	int maxElementIndex = std::max_element(result.begin(), result.end()) - result.begin();
+	cout << "Prediction: " << maxElementIndex << endl;
 	for(size_t i = 0; i < result.size(); i++)
 		cout << result[i][0] << " ";
 	cout << endl << endl;
@@ -84,22 +88,21 @@ int main() {
 	return 0;
 }
 
-vector<float> read_1d_array(ifstream &fin, int cols) {
-  vector<float> arr;
-  arr.reserve(cols);
-  float tmp_float;
-  char tmp_char;
-  fin >> tmp_char;
-  for(int n = 0; n < cols; ++n) {
-    fin >> tmp_float;
-    arr.push_back(tmp_float);
-  }
-  fin >> tmp_char;
-  return arr;
+vector_1d read_1d_array(ifstream &fin, int cols) {
+	vector_1d arr;
+	arr.reserve(cols);
+	float tmp_float;
+	char tmp_char;
+	fin >> tmp_char;
+	for (int n = 0; n < cols; ++n) {
+		fin >> tmp_float;
+		arr.push_back(tmp_float);
+	}
+	fin >> tmp_char;
+	return arr;
 }
 
 void read_from_file(const std::string &fname) {
-
 	int m_depth, m_rows, m_cols;
 	ifstream fin(fname.c_str());
 	if(fin.fail())
@@ -108,9 +111,9 @@ void read_from_file(const std::string &fname) {
 	data.reserve(m_depth * m_rows * m_cols);
 
 	for (int d = 0; d < m_depth; ++d) {
-		vector < vector<float> > tmp_single_depth;
+		vector_2d tmp_single_depth;
 		for (int r = 0; r < m_rows; ++r) {
-			vector<float> tmp_row = read_1d_array(fin, m_cols);
+			vector_1d tmp_row = read_1d_array(fin, m_cols);
 			tmp_single_depth.push_back(tmp_row);
 		}
 		data.push_back(tmp_single_depth);

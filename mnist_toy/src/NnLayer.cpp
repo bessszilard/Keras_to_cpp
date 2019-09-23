@@ -13,29 +13,34 @@
 
 // Dense ==========================================================================================
 // private ----------------------------------------------------------------------------------------
-vector_2d Dense::softmax(const vector_2d &input) {
+vector_2d Dense::activaction(const vector_2d &input) {
 	if(input[0].size() != 1)
 		throw std::invalid_argument("Activation couldn't completed, because this is not a column vector");
 	int orig_row = input.size();
 	vector_2d result(orig_row, vector_1d(1));
-	if(m_activation_type == "softmax") {
-		float sum = 0.0;
-		for(int k = 0; k < orig_row; ++k) {
-		  float temp = exp(input[k][0]);
-		  result[k][0] = temp;
-		  sum += temp;
+
+	if (m_activation_type == "relu") {
+		for (int i = 0; i < orig_row; ++i) {
+			result[i][0] = input[i][0] < 0 ? 0 : input[i][0];
 		}
-		for(int k = 0; k < orig_row; k++)
-			result[k][0] /= sum;
 		return result;
 	}
-	else {
+	else if (m_activation_type == "softmax") {
+		float sum = 0.0;
+		for (int k = 0; k < orig_row; ++k) {
+			float temp = exp(input[k][0]);
+			result[k][0] = temp;
+			sum += temp;
+		}
+		for (int k = 0; k < orig_row; k++)
+			result[k][0] /= sum;
+		return result;
+	} else {
 		throw std::invalid_argument("Unknown activation function");
 	}
 }
 
 // public ---------------------------------------------------------------------------------------
-//NnLayer::NnLayer() {
 Dense::Dense(const std::vector<std::vector<float> > &weights,
 				 const std::vector<std::vector<float> > &bias,
 				 const std::string &a_type) :
@@ -51,10 +56,6 @@ inline void dotprodWithRelu(vector_2d &m_weights, int col, const vector_2d &inpu
 		sum += m_weights[k][col] * input[k][0];
 	}
 	sum += m_bias;
-	if (act_type == "relu") {
-		if (sum < 0)
-			sum = 0;
-	}
 	output = sum;
 }
 
@@ -71,9 +72,7 @@ vector_2d Dense::get_output(const vector_2d &input) {
 //	for (size_t i = 0; i < m_weights[0].size(); ++i) {
 //		threads[i].join();
 //	}
-	if (m_activation_type == "relu")
-		return new_weights;
-	return softmax(new_weights);
+	return activaction(new_weights);
 }
 
 // Flatten ========================================================================================
