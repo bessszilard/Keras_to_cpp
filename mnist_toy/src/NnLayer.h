@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-typedef std::vector<float>     float_vector; // 1D
+typedef std::vector<float>     vector_1d; // 1D
 typedef std::vector<std::vector<float> > vector_2d;
 
 // NnLayer ========================================================================================
@@ -43,6 +43,7 @@ public:
 	vector_2d get_output(const vector_2d &input);
 };
 
+// Dense ==========================================================================================
 class Dense   : public NnLayer {
 private:
 	vector_2d m_weights;
@@ -51,6 +52,7 @@ private:
 
 private:
 	vector_2d softmax(const vector_2d &input);
+//	void dotprodWithRelu(int col, const vector_2d &input, float &output);
 
 public:
 	Dense(const vector_2d &weights, const  vector_2d &bias, const std::string &a_type);

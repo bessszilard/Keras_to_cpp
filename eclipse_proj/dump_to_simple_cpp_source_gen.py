@@ -98,5 +98,9 @@ with open(args.output, 'w') as fout:
             temp_str = str(temp_str).replace("]", "}")
                         
             # fout.write(str(model.layers[ind].get_weights()[1]) + '\n')
-            fout.write(str(temp_str) + '\n')
+            fout.write(str(temp_str))
             fout.write('};\n')
+
+            # print( l['config']['activation'] )
+            fout.write('std::string layer' + str(ind) + l['class_name'] + 'Activation = \"' + l['config']['activation'] + '\";\n\n')
+            

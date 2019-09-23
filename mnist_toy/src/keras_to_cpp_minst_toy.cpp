@@ -19,14 +19,14 @@ using std::ifstream;
 using std::vector;
 
 std::vector<std::vector<std::vector<float> > > data; // depth, rows, cols
-
 vector<float> read_1d_array(ifstream &fin, int cols);
-void read_from_file(const std::string &fname);
 
 struct clock_bounds {
 	clock_t start;
 	clock_t end;
 };
+
+void read_from_file(const std::string &fname);
 
 double getms(clock_bounds clk) {
 	return ((double) (clk.end - clk.start) * 1000 / CLOCKS_PER_SEC);
@@ -42,6 +42,7 @@ int main() {
 	float t_FileRead = 0;
 	float t_CalcOut = 0;
 	vector_2d result;
+
 	int iterations = 50;
 	for(int i = 0; i < iterations; i++) {
 		clock_bounds clkExecuition, clkInit, clkFileRead, clkCaclOut;
@@ -50,9 +51,9 @@ int main() {
 
 		NeuralNetwork nn;
 		nn.add_layer(new Flatten());
-		nn.add_layer(new Dense(layer1DenseWeights, layer1DenseBias, "relu"		));
-		nn.add_layer(new Dense(layer3DenseWeights, layer3DenseBias, "relu" 		));
-		nn.add_layer(new Dense(layer5DenseWeights, layer5DenseBias, "softmax" 	));
+		nn.add_layer(new Dense(layer1DenseWeights, layer1DenseBias, layer1DenseActivation ));
+		nn.add_layer(new Dense(layer2DenseWeights, layer2DenseBias, layer2DenseActivation ));
+		nn.add_layer(new Dense(layer3DenseWeights, layer3DenseBias, layer3DenseActivation ));
 		clkInit.end = clock();
 
 		clkFileRead.start = clkInit.end;
@@ -73,7 +74,7 @@ int main() {
 	}
 	for(size_t i = 0; i < result.size(); i++)
 		cout << result[i][0] << " ";
-	cout << endl;
+	cout << endl << endl;
 
 	cout << "Init:           " << t_Init      / iterations << " [ms]\t" << (int)(100 * (t_Init      / t_execution)) << "%"<< endl;
 	cout << "File read:      " << t_FileRead  / iterations << " [ms]\t" << (int)(100 * (t_FileRead  / t_execution)) << "%"<< endl;
