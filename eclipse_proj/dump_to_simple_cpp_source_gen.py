@@ -35,7 +35,7 @@ with open(args.output, 'w') as fout:
     fout.write('// layers ' + str(len(model.layers)) + '\n')
 
     layers = []
-    fout.write("#include <vector>\n\n")
+    fout.write("#include \"nnVector.h\"\n\n")
     print((arch["config"]["layers"]))
     for ind, l in enumerate(arch["config"]["layers"]):
         if args.verbose:
@@ -44,7 +44,7 @@ with open(args.output, 'w') as fout:
         #     continue
 
         # fout.write('layer ' + str(ind) + ' ' + l['class_name'] + '\n')
-        fout.write('const std::vector<std::vector<float> > layer' + str(ind) + l['class_name'])
+        fout.write('const vector_2d layer' + str(ind) + l['class_name'])
 
         if args.verbose:
             print( str(ind), l['class_name'])
@@ -91,7 +91,7 @@ with open(args.output, 'w') as fout:
                 # fout.write('>>' + str(w) + '\n')
                 fout.write(str(temp_str) + ',\n')
             fout.write('};\n')
-            fout.write('const std::vector<std::vector<float> > layer' + str(ind) + l['class_name'] + 'Bias = {')
+            fout.write('const vector_2d layer' + str(ind) + l['class_name'] + 'Bias = {')
             
             temp_str = list(model.layers[ind].get_weights()[1])
             temp_str = str(temp_str).replace("[", "{")
