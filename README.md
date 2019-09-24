@@ -17,11 +17,24 @@ alma
 
 * Download AARCH64 build root image [aarch64-linux-3.15rc2-buildroot.img](https://github.com/675816156/Qemu-aarch64) 
 
-* Run the virtual machine: [source]((https://www.bennee.com/~alex/blog/2014/05/09/running-linux-in-qemus-aarch64-system-emulation-mode/)) ```
-$ qemu-system-aarch64 -machine virt -cpu cortex-a53 -machine type=virt -nographic -smp 1 -m 2048 -kernel aarch64-linux-3.15rc2-buildroot.img --append "console=ttyAMA0"```
+* Run the virtual machine: [source]((https://www.bennee.com/~alex/blog/2014/05/09/running-linux-in-qemus-aarch64-system-emulation-mode/)) 
+```
+$ qemu-system-aarch64 -machine virt -cpu cortex-a53 -machine type=virt \
+-nographic -smp 1 -m 2048 -kernel aarch64-linux-3.15rc2-buildroot.img  \
+--append "console=ttyAMA0"
+```
+
+* Exit from Qemu console
+``` Ctrl-A X ```
 
 * Share “/home/szilard/qemu/bennee/qemu_shared” folder with Qemu virtual machine:
-```$ qemu-system-aarch64 -machine virt -cpu cortex-a53 -machine type=virt -nographic -smp 1 -m 2048 -kernel aarch64-linux-3.15rc2-buildroot.img --append "console=ttyAMA0" -fsdev local,id=r,path=/home/szilard/qemu/bennee/qemu_shared,security_model=none -device virtio-9p-device,fsdev=r,mount_tag=r ```
+```
+$ qemu-system-aarch64 -machine virt -cpu cortex-a53 -machine type=virt \
+ -nographic -smp 1 -m 2048 -kernel aarch64-linux-3.15rc2-buildroot.img  \
+--append "console=ttyAMA0" \
+-fsdev local,id=r,path=/home/szilard/qemu/bennee/qemu_shared,security_model=none \
+-device virtio-9p-device,fsdev=r,mount_tag=r 
+```
 
 * Mount the shared folder:
 ``` $ mount -t 9p -o trans=virtio r /mnt ```
@@ -95,4 +108,4 @@ void read_from_file(const std::string &fname) {
 	fin.close();
 }
 ```
-
+* Running output in Qemu simulator:
