@@ -30,9 +30,9 @@ vector_2d Dense::activaction(const vector_2d &input) {
 		return result;
 	}
 	else if (m_activation_type == "softmax") {
-		float sum = 0.0;
+		nn_cal_type sum = 0.0;
 		for (int k = 0; k < orig_row; ++k) {
-			float temp = exp(input[k][0]);
+			nn_cal_type temp = exp(input[k][0]);
 			result[k][0] = temp;
 			sum += temp;
 		}
@@ -45,8 +45,8 @@ vector_2d Dense::activaction(const vector_2d &input) {
 }
 
 // public ---------------------------------------------------------------------------------------
-Dense::Dense(const std::vector<std::vector<float> > &weights,
-				 const std::vector<std::vector<float> > &bias,
+Dense::Dense(const std::vector<std::vector<nn_cal_type> > &weights,
+				 const std::vector<std::vector<nn_cal_type> > &bias,
 				 const std::string &a_type) :
 	m_weights(weights), m_bias(bias), m_activation_type(a_type)
 {
@@ -56,8 +56,8 @@ Dense::Dense(const std::vector<std::vector<float> > &weights,
 
 Dense::~Dense() {}
 
-inline void dotprod(vector_2d &m_weights, int col, const vector_2d &input, float m_bias, std::string act_type, float &output) {
-	float sum = 0.0f;
+inline void dotprod(vector_2d &m_weights, int col, const vector_2d &input, nn_cal_type m_bias, std::string act_type, nn_cal_type &output) {
+	nn_cal_type sum = 0.0f;
 	for (size_t k = 0; k < m_weights.size(); ++k) {
 		sum += m_weights[k][col] * input[k][0];
 	}
