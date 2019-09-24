@@ -28,10 +28,11 @@ int main(int argc, char** argv) {
 
 	if(argc < 2)
 		throw std::invalid_argument("Image path is needed");
+
 	string imgPath = argv[1];
 	cout << "Input: " << imgPath << endl;
 
-	int iterations = 10;
+	int iterations = 1;//10;
 	for(int i = 0; i < iterations; i++) {
 
 		clk.start_Init();
@@ -49,7 +50,15 @@ int main(int argc, char** argv) {
 		}
 
 		clk.start_FileRead();
-		vector_2d input = Utilities::read_from_file(imgPath);
+//		vector_2d input = Utilities::read_from_file(imgPath);
+//		vector_2d input = Utilities::read_from_binary_file(imgPath);
+
+//		imgPath = "sample_mnist.dat";
+//		vector_2d input1 = Utilities::read_from_file(imgPath);
+
+		imgPath = "sample_mnist_bin.dat";
+		vector_2d input = Utilities::read_from_binary_file(imgPath);
+
 
 		clk.start_Prediction();
 		result = nn.predict(input);

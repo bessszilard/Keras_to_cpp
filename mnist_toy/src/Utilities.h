@@ -19,8 +19,8 @@ struct clock_bounds {
 };
 
 struct Utilities {
-	static vector_1d read_1d_array(ifstream &fin, int cols);
 	static vector_2d read_from_file(const std::string &fname);
+	static vector_2d read_from_binary_file(const std::string &fname);
 };
 
 class Clocks {
@@ -53,7 +53,6 @@ public:
 	float get_FileRead_average()	{ return m_tFileRead 	/ m_iterations; }
 	float get_Prediction_average()  { return m_tPrediction  / m_iterations; }
 	float get_Execuition_average()  { return m_tExecution   / m_iterations; }
-
 
 	float get_Init_percent()		{ return m_tInit 		/ m_tExecution * 100; }
 	float get_Float_percent()       { return m_tFileRead 	/ m_tExecution * 100; }

@@ -5,37 +5,25 @@
  *      Author: szilard
  */
 #include "Utilities.h"
-
-vector_1d Utilities::read_1d_array(ifstream &fin, int cols) {
-	vector_1d arr(cols);
-//	arr.reserve(cols);
-//	float tmp_float;
-	char tmp_char;
-	fin >> tmp_char;
-	for (int n = 0; n < cols; ++n) {
-//		fin >> tmp_float;
-//		arr.push_back(tmp_float);
-		fin >> arr[n];
-	}
-	fin >> tmp_char;
-	return arr;
-}
+#include <iostream>
 
 vector_2d Utilities::read_from_file(const std::string &fname) {
-	int m_depth, m_rows, m_cols;
+	int depth, rows, cols;
 	ifstream fin(fname.c_str());
 	if(fin.fail())
 		throw std::invalid_argument( "can't open " + fname);
-	fin >> m_depth >> m_rows >> m_cols;
+	fin >> depth >> rows >> cols;
 
-	vector_3d data = vector_3d(m_depth, vector_2d(m_rows, vector_1d(m_cols)));
-	data.reserve(m_depth * m_rows * m_cols);
-	for (int d = 0; d < m_depth; ++d) {
-		for (int r = 0; r < m_rows; ++r) {
+	vector_3d data = vector_3d(depth, vector_2d(rows, vector_1d(cols)));
+//	data.reserve(depth * rows * cols);
+	for (int d = 0; d < depth; ++d) {
+		for (int r = 0; r < rows; ++r) {
 			char tmp_char;
 			fin >> tmp_char;
-			for (int n = 0; n < m_cols; ++n) {
+			for (int n = 0; n < cols; ++n) {
 				fin >> data[d][r][n];
+//				if(0.0 < data[d][r][n])
+//					std::cout << "[" << r << "," << n << "]" << "\t=" << (int)(data[d][r][n]*256) << std::endl;
 			}
 			fin >> tmp_char;
 		}
@@ -43,6 +31,33 @@ vector_2d Utilities::read_from_file(const std::string &fname) {
 
 	fin.close();
 	return data[0];
+}
+
+vector_2d Utilities::read_from_binary_file(const std::string &fname) {
+	int rows = 28, cols = 28;
+	ifstream binFile(fname.c_str(), std::ios::binary | std::ios::in);
+
+	if(binFile.fail())
+		throw std::invalid_argument( "can't open " + fname);
+	binFile.seekg(0, std::ios::end);
+	int fileSize = (int)binFile.tellg();
+
+	if(fileSize != rows * cols)
+		throw std::invalid_argument( "Invalid file size " + fname);
+
+	binFile.seekg(0, std::ios::beg);
+	vector_2d data = vector_2d(rows, vector_1d(cols));
+	unsigned char array[28][28];
+	binFile.read((char*)&array, 28*28);
+
+	for (int r = 0; r < rows; ++r) {
+		for (int n = 0; n < cols; ++n) {
+			data[r][n] = (nn_cal_type)(array[r][n]) / 256;
+		}
+	}
+
+	binFile.close();
+	return data;
 }
 
 double Clocks::getms(clock_bounds clk) {
