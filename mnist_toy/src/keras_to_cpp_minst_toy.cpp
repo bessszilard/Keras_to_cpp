@@ -24,7 +24,6 @@ int main(int argc, char** argv) {
 		throw std::invalid_argument("Image path is needed");
 
 	string imgPath = argv[1];
-//	cout << "Input: " << imgPath << endl;
 
 	int iterations = 50;
 	for(int i = 0; i < iterations; i++) {
@@ -48,16 +47,17 @@ int main(int argc, char** argv) {
 
 		clk.start_Prediction();
 		result = nn.classify(input);
+
 		clk.iteration_finished();
 	}
 
 	cout << "Predicted digit: " << result << endl;
 	cout << endl;
 
-	cout << "Init:         \t" << clk.get_Init_average()          << "\t[ms]\t" << clk.get_Init_percent()		 << "%" << endl;
-	cout << "File read:    \t" << clk.get_FileRead_average()      << "\t[ms]\t" << clk.get_Float_percent()       << "%" << endl;
-	cout << "Prediction:   \t" << clk.get_Prediction_average()    << "\t[ms]\t" << clk.get_Prediction_percent()  << "%" << endl;
-	cout << "Whole process:\t" << clk.get_Execuition_average()    << "\t[ms]"   << endl;
+	cout << "Initialization	\t" << clk.get_Init_average()          << "\t[ms]\t" << clk.get_Init_percent()		  << "%" << endl;
+	cout << "File read	    \t" << clk.get_FileRead_average()      << "\t[ms]\t" << clk.get_Float_percent()       << "%" << endl;
+	cout << "Prediction 	\t" << clk.get_Prediction_average()    << "\t[ms]\t" << clk.get_Prediction_percent()  << "%" << endl;
+	cout << "Whole process	\t" << clk.get_Execuition_average()    << "\t[ms]"   << endl;
 
 	return 0;
 }

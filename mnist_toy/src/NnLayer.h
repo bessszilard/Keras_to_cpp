@@ -15,8 +15,8 @@
 // NnLayer ========================================================================================
 class NnLayer {
 private:
-	int m_input_size;
-	int m_output_size;
+	size_t m_input_size = 0;
+	size_t m_output_size = 0;
 
 	vector_2d m_weights;
 	vector_2d m_bias;
@@ -29,11 +29,11 @@ public:
 	virtual void load_weights(std::ifstream &fin) = 0;
 	virtual vector_2d get_output(const vector_2d &input) = 0;
 
-	int get_inputSize()  { return m_input_size;  }
-	int get_outputSize() { return m_output_size; }
+	size_t get_inputSize()  { return m_input_size;  }
+	size_t get_outputSize() { return m_output_size; }
 
-	void set_inputSize(int size)  { m_input_size = size;  }
-	void set_outputSize(int size) { m_output_size = size; }
+	void set_inputSize(size_t size)  { m_input_size = size;  }
+	void set_outputSize(size_t size) { m_output_size = size; }
 };
 
 // Flatten ========================================================================================

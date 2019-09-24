@@ -66,6 +66,8 @@ Dense::Dense(const std::vector<std::vector<nn_cal_type> > &weights,
 {
 	if(1 < m_bias.size())
 		throw std::invalid_argument("Invalid bias size");
+	set_inputSize(weights.size());
+	set_outputSize(weights[0].size());
 }
 
 Dense::~Dense() {}
@@ -102,8 +104,10 @@ void Dense::load_weights(std::ifstream &fin) {
  *		(n, 1) =  (n, m) * (m, 1) + (n, 1)
  */
 vector_2d Dense::get_output(const vector_2d &input) {
-	if(m_weights.size() != input.size())
+	if(get_inputSize() != input.size())
 		throw std::invalid_argument("Input size is not proper");
+	if(get_outputSize() != m_bias[0].size())
+		throw std::invalid_argument("Weights or bias dimensions is not proper");
 
 	vector_2d new_weights(m_bias[0].size(), vector_1d(1));
 	for (size_t i = 0; i < m_weights[0].size(); ++i) {
@@ -137,15 +141,17 @@ vector_2d Flatten::get_output(const vector_2d &input) {
 // NeuralNetwork ==================================================================================
 
 void NeuralNetwork::load_weights(const std::string &input_fname) {
-	std::ifstream fin(input_fname.c_str());
+	std::ifstream fname(input_fname.c_str());
 	std::string layer_type = "";
 	std::string tmp_str = "";
 	int tmp_int = 0;
 	int m_layers_cnt;
 
-	fin >> tmp_str >> m_layers_cnt;
+	if(fname.fail())
+		throw std::invalid_argument( "can't open " + input_fname);
+	fname >> tmp_str >> m_layers_cnt;
 	for (int layer = 0; layer < m_layers_cnt; ++layer) {
-		fin >> tmp_str >> tmp_int >> layer_type;
+		fname >> tmp_str >> tmp_int >> layer_type;
 
 		NnLayer *l = 0;
 		if (layer_type == "Flatten") {
@@ -157,10 +163,10 @@ void NeuralNetwork::load_weights(const std::string &input_fname) {
 			cout << "Layer is empty," << endl;
 			return;
 		}
-		l->load_weights(fin);
+		l->load_weights(fname);
 		add_layer(l);
 	}
-	fin.close();
+	fname.close();
 }
 
 /*
