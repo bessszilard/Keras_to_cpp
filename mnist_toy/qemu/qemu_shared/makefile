@@ -1,16 +1,19 @@
 CC = arm-linux-gnueabi-g++
 # CC = g++
-CXXFLAGS = -std=c++11 -static
-SRCDIR = ../../src/
+CXX_FLAGS = -std=c++11 -static
+SRC_DIR = ../../src/
 
-keras_to_cpp_minst_toy: keras_to_cpp_minst_toy.o NnLayer.o
-	$(CC) keras_to_cpp_minst_toy.o NnLayer.o -o keras_to_cpp_minst_toy $(CXXFLAGS)
+keras_to_cpp_minst_toy: keras_to_cpp_minst_toy.o NnLayer.o Utilities.o
+	$(CC) keras_to_cpp_minst_toy.o NnLayer.o Utilities.o -o keras_to_cpp_minst_toy $(CXX_FLAGS) 
 
-keras_to_cpp_minst_toy.o: $(SRCDIR)keras_to_cpp_minst_toy.cpp $(SRCDIR)NnLayer.h
-	$(CC) -c $(SRCDIR)keras_to_cpp_minst_toy.cpp $(CXXFLAGS)
+keras_to_cpp_minst_toy.o: $(SRC_DIR)keras_to_cpp_minst_toy.cpp
+	$(CC) -c $(SRC_DIR)keras_to_cpp_minst_toy.cpp $(CXX_FLAGS)
 
-NnLayer.o: $(SRCDIR)NnLayer.cpp $(SRCDIR)NnLayer.h
-	$(CC) -c $(SRCDIR)NnLayer.cpp $(CXXFLAGS)	
+NnLayer.o: $(SRC_DIR)NnLayer.cpp
+	$(CC) -c $(SRC_DIR)NnLayer.cpp $(CXX_FLAGS)
+	
+Utilities.o: $(SRC_DIR)Utilities.cpp
+	$(CC) -c $(SRC_DIR)Utilities.cpp $(CXX_FLAGS)
 	
 clean:
 	rm *.o keras_to_cpp_minst_toy
