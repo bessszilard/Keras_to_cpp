@@ -6,10 +6,14 @@
  */
 
 #include <math.h>
-#include "NnLayer.h"
+#include <fstream>
 #include <time.h>
 #include <stdexcept>
-//#include <thread>
+#include <iostream>
+#include "NnLayer.h"
+
+using std::cout;
+using std::endl;
 
 // Dense ==========================================================================================
 // private ----------------------------------------------------------------------------------------
@@ -45,6 +49,15 @@ vector_2d Dense::activaction(const vector_2d &input) {
 }
 
 // public ---------------------------------------------------------------------------------------
+//void dotprod(vector_2d &m_weights, int col, const vector_2d &input, nn_cal_type m_bias, std::string act_type, nn_cal_type &output) {
+//	nn_cal_type sum = 0.0f;
+//	for (size_t k = 0; k < m_weights.size(); ++k) {
+//		sum += m_weights[k][col] * input[k][0];
+//	}
+//	sum += m_bias;
+//	output = sum;
+//}
+
 Dense::Dense(const std::vector<std::vector<nn_cal_type> > &weights,
 				 const std::vector<std::vector<nn_cal_type> > &bias,
 				 const std::string &a_type) :
@@ -56,31 +69,36 @@ Dense::Dense(const std::vector<std::vector<nn_cal_type> > &weights,
 
 Dense::~Dense() {}
 
-inline void dotprod(vector_2d &m_weights, int col, const vector_2d &input, nn_cal_type m_bias, std::string act_type, nn_cal_type &output) {
-	nn_cal_type sum = 0.0f;
-	for (size_t k = 0; k < m_weights.size(); ++k) {
-		sum += m_weights[k][col] * input[k][0];
-	}
-	sum += m_bias;
-	output = sum;
-}
-/*
-vector_2d Dense::get_output(const vector_2d &input) {
-	// TOOD check dimensions
-	vector_2d new_weights(m_bias[0].size(), vector_1d(1));
-//	std::thread threads[m_weights[0].size()];
+void Dense::load_weights(std::ifstream &fin) {
+	int m_input_cnt, m_neurons;
+	fin >> m_input_cnt >> m_neurons;
+	nn_cal_type tmp_float;
+	char tmp_char = ' ';
+	std::string temp_str;
 
-	// Y = transp(W) * X + transp(B)
-	for (size_t i = 0; i < m_weights[0].size(); ++i) {
-		dotprodWithRelu(m_weights, i, input, m_bias[0][i], m_activation_type, new_weights[i][0]);
-//		threads[i] = std::thread(dotprodWithRelu, std::ref(m_weights), i, std::ref(input), m_bias[0][i], m_activation_type, std::ref(new_weights[i][0]));
+	for (int i = 0; i < m_input_cnt; ++i) {
+		vector_1d tmp_n;
+		fin >> tmp_char; // for '['
+		for (int n = 0; n < m_neurons; ++n) {
+			fin >> tmp_float;
+			tmp_n.push_back(tmp_float);
+		}
+		fin >> tmp_char; // for ']'
+		m_weights.push_back(tmp_n);
 	}
-//	for (size_t i = 0; i < m_weights[0].size(); ++i) {
-//		threads[i].join();
-//	}
-	return activaction(new_weights)s;
+	//cout << "weights " << m_weights.size() << endl;
+
+	vector_1d tmp_n;
+	fin >> tmp_char; // for '['
+	for (int n = 0; n < m_neurons; ++n) {
+		fin >> tmp_float;
+		tmp_n.push_back(tmp_float);
+	}
+	m_bias.push_back(tmp_n);
+	fin >> tmp_char; // for ']'
+	fin >> temp_str >> tmp_char >> temp_str >> temp_str >> m_activation_type;	// layer 1 Dense activation relu
+	//cout << "bias " << m_bias.size() << endl;
 }
-*/
 
 /*
  * Calculates the output of the Dense layer.
@@ -93,9 +111,15 @@ vector_2d Dense::get_output(const vector_2d &input) {
 
 	vector_2d new_weights(m_bias[0].size(), vector_1d(1));
 	for (size_t i = 0; i < m_weights[0].size(); ++i) {
-		dotprod(m_weights, i, input, m_bias[0][i], m_activation_type, new_weights[i][0]);
+		nn_cal_type sum = 0.0f;
+		for (size_t k = 0; k < m_weights.size(); ++k) {
+			sum += m_weights[k][i] * input[k][0];
+		}
+		sum += m_bias[0][i];
+		new_weights[i][0] = sum;
 	}
 	return activaction(new_weights);
+	//		dotprod(m_weights, i, input, m_bias[0][i], m_activation_type, new_weights[i][0]);
 }
 
 // Flatten ========================================================================================
@@ -121,6 +145,48 @@ vector_2d Flatten::get_output(const vector_2d &input) {
 }
 
 // NeuralNetwork ==================================================================================
+
+void NeuralNetwork::load_weights(const std::string &input_fname) {
+//	bool m_verbose = true;
+//	if(m_verbose) std::cout << "Reading model from " << input_fname << std::endl;
+	std::ifstream fin(input_fname.c_str());
+	std::string layer_type = "";
+	std::string tmp_str = "";
+	int tmp_int = 0;
+	int m_layers_cnt;
+
+	fin >> tmp_str >> m_layers_cnt;
+	for (int layer = 0; layer < m_layers_cnt; ++layer) { // iterate over layers
+		fin >> tmp_str >> tmp_int >> layer_type;
+//		if (m_verbose)
+//			cout << "Layer " << tmp_int << " " << layer_type << endl;
+
+		NnLayer *l = 0L;
+//		if (layer_type == "Convolution2D") {
+//			l = new LayerConv2D();
+//		} else if (layer_type == "Activation") {
+//			l = new LayerActivation();
+//		} else if (layer_type == "MaxPooling2D") {
+//			l = new LayerMaxPooling();
+/*		} else */
+		if (layer_type == "Flatten") {
+			l = new Flatten();
+		} else if (layer_type == "Dense") {
+			l = new Dense();
+		}
+		if (l == 0L) {
+			cout
+					<< "Layer is empty, maybe it is not defined? Cannot define network."
+					<< endl;
+			return;
+		}
+		l->load_weights(fin);
+		m_layers.push_back(l);
+	}
+
+	fin.close();
+}
+
 /*
  *	Add new layer to NeuralNetwork class.
  *	Implemented layer types:
@@ -147,7 +213,6 @@ vector_2d NeuralNetwork::predict(const vector_2d &input) {
  * Free the memory of the given layers.
  */
 NeuralNetwork::~NeuralNetwork() {
-//	for(size_t i = 0; i < m_layers.size(); ++i) {
 	for(auto layer : m_layers) {
 		delete layer;
 	}

@@ -36,10 +36,16 @@ int main(int argc, char** argv) {
 
 		clk.start_Init();
 		NeuralNetwork nn;
-		nn.add_layer(new Flatten());
-		nn.add_layer(new Dense(layer1DenseWeights, layer1DenseBias, layer1DenseActivation ));
-		nn.add_layer(new Dense(layer2DenseWeights, layer2DenseBias, layer2DenseActivation ));
-		nn.add_layer(new Dense(layer3DenseWeights, layer3DenseBias, layer3DenseActivation ));
+		// if weights were not given through the console
+		if(argc > 2) {
+			nn.load_weights(argv[2]);
+		}
+		else {
+			nn.add_layer(new Flatten());
+			nn.add_layer(new Dense(layer1DenseWeights, layer1DenseBias, layer1DenseActivation ));
+			nn.add_layer(new Dense(layer2DenseWeights, layer2DenseBias, layer2DenseActivation ));
+			nn.add_layer(new Dense(layer3DenseWeights, layer3DenseBias, layer3DenseActivation ));
+		}
 
 		clk.start_FileRead();
 		vector_2d input = Utilities::read_from_file(imgPath);

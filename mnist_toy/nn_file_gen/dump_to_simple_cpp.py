@@ -83,3 +83,6 @@ with open(args.output, 'w') as fout:
             for w in W:
                 fout.write(str(w) + '\n')
             fout.write(str(model.layers[ind].get_weights()[1]) + '\n')
+
+            # fout.write('activation' + l['config']['activation'] + '\n')
+            fout.write('layer ' + str(ind) + ' ' + l['class_name'] + ' activation ' + l['config']['activation'] + '\n')

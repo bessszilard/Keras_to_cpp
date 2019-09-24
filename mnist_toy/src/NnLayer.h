@@ -24,8 +24,11 @@ private:
 
 public:
 	NnLayer() {};
-	virtual vector_2d get_output(const vector_2d &input) = 0;
 	virtual ~NnLayer() {}
+
+	virtual void load_weights(std::ifstream &fin) = 0;
+	virtual vector_2d get_output(const vector_2d &input) = 0;
+
 	int get_inputSize()  { return m_input_size;  }
 	int get_outputSize() { return m_output_size; }
 
@@ -38,6 +41,7 @@ class Flatten : public NnLayer {
 public:
 	Flatten() {};
 	virtual ~Flatten() {};
+	void load_weights(std::ifstream &fin) {}
 	vector_2d get_output(const vector_2d &input);
 };
 
@@ -54,8 +58,11 @@ private:
 
 public:
 	Dense(const vector_2d &weights, const  vector_2d &bias, const std::string &a_type);
-	virtual vector_2d get_output(const vector_2d &input);
+	Dense() {};
 	virtual ~Dense();
+
+	void load_weights(std::ifstream &fin);
+	vector_2d get_output(const vector_2d &input);
 };
 
 // NnLayer ========================================================================================
@@ -67,6 +74,7 @@ public:
 	NeuralNetwork() {}
 	virtual ~NeuralNetwork();
 
+	void load_weights(const std::string &input_fname);
 	void add_layer(NnLayer *layer);
 	vector_2d predict(const vector_2d &input);
 };
