@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
 	string imgPath = argv[1];
 //	cout << "Input: " << imgPath << endl;
 
-	int iterations = 10;
+	int iterations = 50;
 	for(int i = 0; i < iterations; i++) {
 
 		clk.start_Init();

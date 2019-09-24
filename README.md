@@ -63,7 +63,7 @@ $ python h5_to_dumped_nnet.py -a my_nn_arch.json -w my_nn_weights.h5 -o ../src/d
 ```
 ### 1.3. Importing generated files
 The program can work in 2 modes, in *modifiable* and *fixed* weights. In *modifiable* weights* mode, the program reads the neural network weights from an external .nnet file, which can be given as an argument in the command line. In this case, the neural network architecture and weights is determined in the external file. The architecture and weight loading process is handled in ```NeuralNetwork::load_weights()``` function in [NnLayer.cpp](mnist_toy/src/NnLayer.cpp) file. 
-In the fixed weights mode neural network architecture is created manually in [keras_to_cpp_minst_toy.cpp](mnist_toy/src/keras_to_cpp_minst_toy.cpp) file in the main function, and weights are save in [dumped.h](mnist_toy/src/dumped.h) file. The advantage of this solution, that the initialization process can be more than 120x faster.
+In the fixed weights mode neural network architecture is created manually in [keras_to_cpp_minst_toy.cpp](mnist_toy/src/keras_to_cpp_minst_toy.cpp) file in the main function, and weights are save in [dumped.h](mnist_toy/src/dumped.h) file. With this solution, that the initialization process can be more than 120x faster comparing to first mode.
 
 ### 1.4. Prediction
 The whole prediction is done in ```NeuralNetwork::predict()``` function in [NnLayer.cpp](mnist_toy/src/NnLayer.cpp). For the generalization output and the input is also a vector_2d variable. The classified number is the of the output vector's biggest element. 
@@ -138,12 +138,13 @@ $ qemu-system-aarch64 -machine virt -cpu cortex-a53 -machine type=virt \
 
 ### 4.3. Double vs float speed difference
 
-| Process name      | Double [ms]  | Float [ms] |
-| ----------------- | -------------: | -------------: |
-| Initialization 	| 4.5906	 | 	3.5135    | 
-| File read    	 	| 1.6706	 | 	1.4148    | 
-| Prediction   	 	| 35.6767    | 26.4019   | 
-| Whole process	 	| 41.9484	 | 31.3385   | 
+| Process name      | Float [ms]     | Double [ms]   |Long Double [ms]|  
+| ----------------- | -------------: | -------------:|-------------:  |
+| Initialization 	| 	3.5135       | 4.17146	     |4.0997	      | 
+| File read    	 	| 	1.4148       | 1.27158	     |1.2669	      | 
+| Prediction   	 	|  26.4019       | 34.8526       |35.1715	      | 
+| Whole process	 	|  31.3385       | 40.3045	     |40.5475	      | 
+
 
 ### 4.4. Execution time changes in commits
 
