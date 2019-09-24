@@ -147,8 +147,9 @@ vector_2d NeuralNetwork::predict(const vector_2d &input) {
  * Free the memory of the given layers.
  */
 NeuralNetwork::~NeuralNetwork() {
-	for(size_t i = 0; i < m_layers.size(); ++i) {
-		delete m_layers[i];
+//	for(size_t i = 0; i < m_layers.size(); ++i) {
+	for(auto layer : m_layers) {
+		delete layer;
 	}
 }
 

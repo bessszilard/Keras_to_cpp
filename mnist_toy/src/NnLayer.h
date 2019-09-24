@@ -5,14 +5,18 @@
  *      Author: szilard
  */
 
+//#pragma once
 #ifndef NNLAYER_H_
 #define NNLAYER_H_
 
 #include <string>
 #include <vector>
 
-typedef std::vector<float>     vector_1d; // 1D
+// TODO using vector_1d = std::vector<float>; - modernebb
+// TODO Double <-> float
+typedef std::vector<float>     	 vector_1d;
 typedef std::vector< vector_1d > vector_2d;
+typedef std::vector< vector_2d > vector_3d;
 
 // NnLayer ========================================================================================
 class NnLayer {
