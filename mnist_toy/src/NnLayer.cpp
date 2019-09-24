@@ -49,14 +49,14 @@ vector_2d Dense::activaction(const vector_2d &input) {
 }
 
 // public ---------------------------------------------------------------------------------------
-//void dotprod(vector_2d &m_weights, int col, const vector_2d &input, nn_cal_type m_bias, std::string act_type, nn_cal_type &output) {
-//	nn_cal_type sum = 0.0f;
-//	for (size_t k = 0; k < m_weights.size(); ++k) {
-//		sum += m_weights[k][col] * input[k][0];
-//	}
-//	sum += m_bias;
-//	output = sum;
-//}
+void dotprod(vector_2d &m_weights, int col, const vector_2d &input, nn_cal_type m_bias, std::string act_type, nn_cal_type &output) {
+	nn_cal_type sum = 0.0f;
+	for (size_t k = 0; k < m_weights.size(); ++k) {
+		sum += m_weights[k][col] * input[k][0];
+	}
+	sum += m_bias;
+	output = sum;
+}
 
 Dense::Dense(const std::vector<std::vector<nn_cal_type> > &weights,
 				 const std::vector<std::vector<nn_cal_type> > &bias,
@@ -111,15 +111,15 @@ vector_2d Dense::get_output(const vector_2d &input) {
 
 	vector_2d new_weights(m_bias[0].size(), vector_1d(1));
 	for (size_t i = 0; i < m_weights[0].size(); ++i) {
-		nn_cal_type sum = 0.0f;
-		for (size_t k = 0; k < m_weights.size(); ++k) {
-			sum += m_weights[k][i] * input[k][0];
-		}
-		sum += m_bias[0][i];
-		new_weights[i][0] = sum;
+//		nn_cal_type sum = 0.0f;
+//		for (size_t k = 0; k < m_weights.size(); ++k) {
+//			sum += m_weights[k][i] * input[k][0];
+//		}
+//		sum += m_bias[0][i];
+//		new_weights[i][0] = sum;
+		dotprod(m_weights, i, input, m_bias[0][i], m_activation_type, new_weights[i][0]);
 	}
 	return activaction(new_weights);
-	//		dotprod(m_weights, i, input, m_bias[0][i], m_activation_type, new_weights[i][0]);
 }
 
 // Flatten ========================================================================================
@@ -147,8 +147,6 @@ vector_2d Flatten::get_output(const vector_2d &input) {
 // NeuralNetwork ==================================================================================
 
 void NeuralNetwork::load_weights(const std::string &input_fname) {
-//	bool m_verbose = true;
-//	if(m_verbose) std::cout << "Reading model from " << input_fname << std::endl;
 	std::ifstream fin(input_fname.c_str());
 	std::string layer_type = "";
 	std::string tmp_str = "";
@@ -158,32 +156,20 @@ void NeuralNetwork::load_weights(const std::string &input_fname) {
 	fin >> tmp_str >> m_layers_cnt;
 	for (int layer = 0; layer < m_layers_cnt; ++layer) { // iterate over layers
 		fin >> tmp_str >> tmp_int >> layer_type;
-//		if (m_verbose)
-//			cout << "Layer " << tmp_int << " " << layer_type << endl;
 
 		NnLayer *l = 0L;
-//		if (layer_type == "Convolution2D") {
-//			l = new LayerConv2D();
-//		} else if (layer_type == "Activation") {
-//			l = new LayerActivation();
-//		} else if (layer_type == "MaxPooling2D") {
-//			l = new LayerMaxPooling();
-/*		} else */
 		if (layer_type == "Flatten") {
 			l = new Flatten();
 		} else if (layer_type == "Dense") {
 			l = new Dense();
 		}
 		if (l == 0L) {
-			cout
-					<< "Layer is empty, maybe it is not defined? Cannot define network."
-					<< endl;
+			cout << "Layer is empty, maybe it is not defined? Cannot define network." << endl;
 			return;
 		}
 		l->load_weights(fin);
-		m_layers.push_back(l);
+		add_layer(l);
 	}
-
 	fin.close();
 }
 

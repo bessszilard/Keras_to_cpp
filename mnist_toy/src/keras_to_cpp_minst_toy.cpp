@@ -31,11 +31,12 @@ int main(int argc, char** argv) {
 	string imgPath = argv[1];
 	cout << "Input: " << imgPath << endl;
 
-	int iterations = 50;
+	int iterations = 10;
 	for(int i = 0; i < iterations; i++) {
 
 		clk.start_Init();
 		NeuralNetwork nn;
+
 		// if weights were not given through the console
 		if(argc > 2) {
 			nn.load_weights(argv[2]);
