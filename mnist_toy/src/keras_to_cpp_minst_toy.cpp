@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
 	string imgPath = argv[1];
 	cout << "Input: " << imgPath << endl;
 
-	int iterations = 1;//10;
+	int iterations = 10;
 	for(int i = 0; i < iterations; i++) {
 
 		clk.start_Init();
@@ -50,15 +50,7 @@ int main(int argc, char** argv) {
 		}
 
 		clk.start_FileRead();
-//		vector_2d input = Utilities::read_from_file(imgPath);
-//		vector_2d input = Utilities::read_from_binary_file(imgPath);
-
-//		imgPath = "sample_mnist.dat";
-//		vector_2d input1 = Utilities::read_from_file(imgPath);
-
-		imgPath = "sample_mnist_bin.dat";
 		vector_2d input = Utilities::read_from_binary_file(imgPath);
-
 
 		clk.start_Prediction();
 		result = nn.predict(input);
@@ -71,9 +63,9 @@ int main(int argc, char** argv) {
 		cout << result[i][0] << " ";
 	cout << endl;
 
-	cout << "Init:           " << clk.get_Init_average()          << " [ms]\t" << clk.get_Init_percent()		<< " %" << endl;
-	cout << "File read:      " << clk.get_FileRead_average()      << " [ms]\t" << clk.get_Float_percent()       << " %" << endl;
-	cout << "Prediction out: " << clk.get_Prediction_average()    << " [ms]\t" << clk.get_Prediction_percent()  << " %" << endl;
+	cout << "Init:           " << clk.get_Init_average()          << " [ms]\t" << clk.get_Init_percent()		<< "%" << endl;
+	cout << "File read:      " << clk.get_FileRead_average()      << " [ms]\t" << clk.get_Float_percent()       << "%" << endl;
+	cout << "Prediction out: " << clk.get_Prediction_average()    << " [ms]\t" << clk.get_Prediction_percent()  << "%" << endl;
 	cout << "Execution time: " << clk.get_Execuition_average()    << " [ms]"   << endl;
 
 	return 0;

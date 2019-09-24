@@ -54,9 +54,9 @@ public:
 	float get_Prediction_average()  { return m_tPrediction  / m_iterations; }
 	float get_Execuition_average()  { return m_tExecution   / m_iterations; }
 
-	float get_Init_percent()		{ return m_tInit 		/ m_tExecution * 100; }
-	float get_Float_percent()       { return m_tFileRead 	/ m_tExecution * 100; }
-	float get_Prediction_percent()  { return m_tPrediction  / m_tExecution * 100; }
+	float get_Init_percent()		{ return (int)(m_tInit 		 / m_tExecution * 100); }
+	float get_Float_percent()       { return (int)(m_tFileRead 	 / m_tExecution * 100); }
+	float get_Prediction_percent()  { return (int)(m_tPrediction / m_tExecution * 100); }
 };
 
 #endif /* UTILITIES_H_ */
