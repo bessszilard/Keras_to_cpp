@@ -1,9 +1,9 @@
-# Toy MNIST model
+# **Toy** MNIST model
 ## Task description
 1. Implement the trained model for a Cortex A53 processor in C or C++. You can only use standard libraries.
 2. Deliver the application as source code and build scripts and the resulting binary that can run in qemu simulator.
 3. The application must accept input files of 28x28 bytes containing MNIST handwritten digits and must output the predicted digit on the console and the execution time
-4. Demonstrate that you have actually run this application on an ARM CPU or in a simulator..
+4. Demonstrate that you have actually run this application on an ARM CPU or in a simulator.
 5. Outline your ideas on improving this model in speed and accuracy
 
 ## Project structure
@@ -58,25 +58,19 @@ $ python h5_to_dumped_h.py -a my_nn_arch.json -w my_nn_weights.h5 -o ../dumped.n
 $ python h5_to_dumped_nnet.py -a my_nn_arch.json -w my_nn_weights.h5 -o ../src/dumped.h -v 1
 ```
 ### 1.3. Importing generated files
-The program can work in 2 modes, in *modifiable* and *fixed* weights. In *modifiable* weights* mode, the program reads the neural network weights from an external .nnet file, which can be given as an argument in the command line. In this case, the neural network architecture and weights is determined in the external file. The architecture and weight loading process is handled in ```NeuralNetwork::load_weights()``` function in [NnLayer.cpp](mnist_toy/src/NnLayer.cpp) file. 
-In the fixed weights mode neural network architecture is created manually in [keras_to_cpp_minst_toy.cpp](mnist_toy/src/keras_to_cpp_minst_toy.cpp) file in the main function, and weights are save in [dumped.h](mnist_toy/src/dumped.h) file. With this solution, that the initialization process can be more than 120x faster comparing to first mode.
+The program can work in 2 modes, in *modifiable* and *fixed* weights. In *modifiable* weights* mode, the program reads the neural network weights from an external .nnet file, which can be given as an argument in the command line. In this case, the neural network architecture and weights are determined in the external file. The architecture construction and weight loading process are handled in ```NeuralNetwork::load_weights()``` function in [NnLayer.cpp](mnist_toy/src/NnLayer.cpp) file. 
+In the fixed weights mode, the neural network architecture is created manually in [keras_to_cpp_minst_toy.cpp](mnist_toy/src/keras_to_cpp_minst_toy.cpp) file in the main function and weights are save in [dumped.h](mnist_toy/src/dumped.h) file. With this solution, the initialization process can be more than 120x faster compared to the first mode.
 
 ### 1.4. Updating weights
 
 The output of the Dense layer is calculated with this formula:
 
-*W - Weights of the current layer*
+| *W - Weights of the current layer* | *X - Input*               |
+| ----------------- | -------------  |
+| ***B - Bias***                     | ***σ - activation function*** |
+| ***Y - Layer output***             |                           |
 
-*X - Input*
-
-*B - Bias*
-
-*σ - activation function*
-
-*Y - Layer output*
-
-<center>  <code>y = σ(transpose(W) * X + transpose(B) )</code>  </center>
-
+<center>  <code>y = σ( transpose(W) * X + transpose(B) )</code>  </center>
 ### 1.5. Prediction
 The whole prediction is done in ```NeuralNetwork::predict()``` function in [NnLayer.cpp](mnist_toy/src/NnLayer.cpp). For the generalization output and the input is also a vector_2d variable. The classified number is the of the output vector's biggest element. 
 ```c++
@@ -142,7 +136,7 @@ $ qemu-system-aarch64 -machine virt -cpu cortex-a53 -machine type=virt \
 ### 4.1. Run results
 ![](readme_imgs/cpu_info.png)
 
-### 4.2. Modifiable and fixed weights
+### 4.2. Modifiable and fixed weights (float)
 
 | Process name      | Modifiable weights [ms]  | Fixed weights [ms] |
 | ----------------- | -------------: | -------------: |
@@ -151,7 +145,9 @@ $ qemu-system-aarch64 -machine virt -cpu cortex-a53 -machine type=virt \
 | Prediction   	| 29.702	 | 26.387   |
 | Whole process	| 600.178	 | 31.750   |
 
-### 4.3. Double vs float speed difference
+### 4.3. Speed difference in float, double and long double calculation
+
+The calculation type can be determined in [nnVector.h](mnist_toy/src/nnVector.h)
 
 | Process name      | Float [ms]     | Double [ms]   |Long Double [ms]|
 | ----------------- | -------------: | -------------:|-------------:  |
@@ -160,7 +156,7 @@ $ qemu-system-aarch64 -machine virt -cpu cortex-a53 -machine type=virt \
 | Prediction   	 	|  26.4019       | 34.8526       |35.1715	      |
 | Whole process	 	|  31.3385       | 40.3045	     |40.5475	      |
 
-### 4.4. Execution time changes in commits
+### 4.4. Execution time changes in commits (float)
 
 ![](readme_imgs/init_t_commits.png)
 
@@ -178,12 +174,13 @@ $ qemu-system-aarch64 -machine virt -cpu cortex-a53 -machine type=virt \
 
 ### 5.1. Improve speed
 
-* We can use processors which has built in NPU
-* We can use SIMD and Floating-point support at matrix multiplication
+* Use processors which have built-in [NPU](https://www.96boards.org/product/tb-96aiot/)
+* Use SIMD and Floating-point support at matrix multiplication
+* Use the float type for calculations
 
 ### 5.2. Improve accuracy
 
-* Use double instead of float
-* Generate validation set from the training set. With validation set, we can get the quality of our results, and we are able to detect over fitting.
-* Increase the data set size with image augmentation. We can use for example blurring, scaling, zooming, and sharpening etc.. With augmentation we can get more generalized results.
-* Use convolutional neural network for this image classification task to increase robustness. In this case, the neural network doesn't focus on the whole image, rather than only on image features. The Kaggle architecture is much more complex, but we can get 99.3% accuracy.
+* Use the double or the long double types for calculations
+* Generate validation set from the training set. With the validation set, we can get the quality of our results, and we can detect overfitting.
+* Increase the data set size with image augmentation. We can use for example blurring, scaling, zooming, and sharpening. With augmentation, we can get more generalized results.
+* Use a convolutional neural network for this image classification task to increase robustness. In this case, the neural network doesn't focus on the whole image, rather than only on image features. The [Kaggle](https://www.kaggle.com/saurabhyadav919/mnist-kernel) architecture is much more complicated, but we can get 99.3% accuracy.
