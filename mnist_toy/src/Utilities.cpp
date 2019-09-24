@@ -7,6 +7,9 @@
 #include "Utilities.h"
 #include <iostream>
 
+/*
+ * Reading plain text file
+ */
 vector_2d Utilities::read_from_file(const std::string &fname) {
 	int depth, rows, cols;
 	ifstream fin(fname.c_str());
@@ -29,7 +32,11 @@ vector_2d Utilities::read_from_file(const std::string &fname) {
 	fin.close();
 	return data[0];
 }
-
+/*
+ * Check the file availability, the size, and if it's proper
+ * copies to an array. For the final step, we copy the normalized array
+ * element into the vector_2d
+ */
 vector_2d Utilities::read_from_binary_file(const std::string &fname) {
 	int rows = 28, cols = 28;
 	ifstream binFile(fname.c_str(), std::ios::binary | std::ios::in);

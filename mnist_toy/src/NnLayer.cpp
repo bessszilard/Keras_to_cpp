@@ -59,6 +59,9 @@ void Dense::dotprod(vector_2d &m_weights, int col, const vector_2d &input, nn_ca
 	output = sum;
 }
 
+/*
+ * Copy the reference of the weight and bias and it's size
+ */
 Dense::Dense(const std::vector<std::vector<nn_cal_type> > &weights,
 				 const std::vector<std::vector<nn_cal_type> > &bias,
 				 const std::string &a_type) :
@@ -72,6 +75,9 @@ Dense::Dense(const std::vector<std::vector<nn_cal_type> > &weights,
 
 Dense::~Dense() {}
 
+/*
+ * Allocates vector memory, and loads the weights from the file
+ */
 void Dense::load_weights(std::ifstream &fin) {
 	int input_cnt, neurons;
 	fin >> input_cnt >> neurons;
@@ -118,7 +124,6 @@ vector_2d Dense::get_output(const vector_2d &input) {
 
 // Flatten ========================================================================================
 // public ---------------------------------------------------------------------------------------
-
 /*
  * Creates Resize input into column vector.
  * input 	(n ,  m)
@@ -139,7 +144,9 @@ vector_2d Flatten::get_output(const vector_2d &input) {
 }
 
 // NeuralNetwork ==================================================================================
-
+/*
+ * Loads weights from a given file
+ */
 void NeuralNetwork::load_weights(const std::string &input_fname) {
 	std::ifstream fname(input_fname.c_str());
 	std::string layer_type = "";
@@ -191,6 +198,9 @@ vector_2d NeuralNetwork::predict(const vector_2d &input) {
 	return temp;
 }
 
+/*
+ * Classifies the MNIST image. The classified number is the index of the maximal element
+ */
 int NeuralNetwork::classify(const vector_2d &input) {
 	vector_2d result  = predict(input);
 	return std::max_element(result.begin(), result.end()) - result.begin();
