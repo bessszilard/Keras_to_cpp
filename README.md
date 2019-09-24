@@ -42,10 +42,6 @@
 ├── README.md
 └── README.pdf
 ```
-# Summary
-
-
-
 
 ## 1. Implement the trained model for a Cortex A53 processor in C or C++. You can only use standard libraries.
 
@@ -65,7 +61,23 @@ $ python h5_to_dumped_nnet.py -a my_nn_arch.json -w my_nn_weights.h5 -o ../src/d
 The program can work in 2 modes, in *modifiable* and *fixed* weights. In *modifiable* weights* mode, the program reads the neural network weights from an external .nnet file, which can be given as an argument in the command line. In this case, the neural network architecture and weights is determined in the external file. The architecture and weight loading process is handled in ```NeuralNetwork::load_weights()``` function in [NnLayer.cpp](mnist_toy/src/NnLayer.cpp) file. 
 In the fixed weights mode neural network architecture is created manually in [keras_to_cpp_minst_toy.cpp](mnist_toy/src/keras_to_cpp_minst_toy.cpp) file in the main function, and weights are save in [dumped.h](mnist_toy/src/dumped.h) file. With this solution, that the initialization process can be more than 120x faster comparing to first mode.
 
-### 1.4. Prediction
+### 1.4. Updating weights
+
+The output of the Dense layer is calculated with this formula:
+
+*W - Weights of the current layer*
+
+*X - Input*
+
+*B - Bias*
+
+*σ - activation function*
+
+*Y - Layer output*
+
+<center>  <code>y = σ(transpose(W) * X + transpose(B) )</code>  </center>
+
+### 1.5. Prediction
 The whole prediction is done in ```NeuralNetwork::predict()``` function in [NnLayer.cpp](mnist_toy/src/NnLayer.cpp). For the generalization output and the input is also a vector_2d variable. The classified number is the of the output vector's biggest element. 
 ```c++
 vector_2d NeuralNetwork::predict(const vector_2d &input) {
@@ -115,12 +127,15 @@ $ qemu-system-aarch64 -machine virt -cpu cortex-a53 -machine type=virt \
 ## 3. The application must accept input files of 28x28 bytes containing MNIST handwritten digits and must output the predicted digit on the console and the execution time
 
 * Binary image reading is implemented in ```Utilities::read_from_binary_file()``` function in [Utilities.cpp](mnist_toy/src/Utilities.cpp). After the file reading 
-
-* Run the execution file:
+* Run the execution file in fixed weights mode:
 
 ``` $ ./keras_to_cpp_minst_toy sample_mnist_bin.dat ```
 
 ![ ](readme_imgs/basic_execution.png)
+
+- Run the execution file in Modifiable weights mode:
+
+``` $ ./keras_to_cpp_minst_toy sample_mnist_bin.dat dumped.nnet  ```
 
 ## 4. Demonstrate that you have actually run this application on an ARM CPU or in a simulator.
 
@@ -138,19 +153,29 @@ $ qemu-system-aarch64 -machine virt -cpu cortex-a53 -machine type=virt \
 
 ### 4.3. Double vs float speed difference
 
-| Process name      | Float [ms]     | Double [ms]   |Long Double [ms]|  
+| Process name      | Float [ms]     | Double [ms]   |Long Double [ms]|
 | ----------------- | -------------: | -------------:|-------------:  |
-| Initialization 	| 	3.5135       | 4.17146	     |4.0997	      | 
-| File read    	 	| 	1.4148       | 1.27158	     |1.2669	      | 
-| Prediction   	 	|  26.4019       | 34.8526       |35.1715	      | 
-| Whole process	 	|  31.3385       | 40.3045	     |40.5475	      | 
-
+| Initialization 	| 	3.5135       | 4.17146	     |4.0997	      |
+| File read    	 	| 	1.4148       | 1.27158	     |1.2669	      |
+| Prediction   	 	|  26.4019       | 34.8526       |35.1715	      |
+| Whole process	 	|  31.3385       | 40.3045	     |40.5475	      |
 
 ### 4.4. Execution time changes in commits
 
-!!!!IMAGE!!!!
+![](readme_imgs/init_t_commits.png)
+
+
+
+![](readme_imgs/prediction_t_commits.png)
+
+
+
+![](readme_imgs/whole_t_commits.png)
+
+
 
 ## 5. Outline your ideas on improving this model in speed and accuracy
+
 ### 5.1. Improve speed
 
 * We can use processors which has built in NPU
