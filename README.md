@@ -18,13 +18,14 @@
 │   │       └── subdir.mk
 │   ├── dumped.nnet
 │   ├── nn_file_gen
-│   │   ├── h5_to_dumped_h.py
-│   │   ├── h5_to_dumped_nnet.py
+│   │   ├── dump_to_simple_cpp.py
+│   │   ├── dump_to_simple_cpp_source_gen.py
 │   │   └── mnist_toy_model.ipynb
 │   ├── qemu
 │   │   ├── aarch64-linux-3.15rc2-buildroot.img
 │   │   └── qemu_shared
 │   │       ├── dumped.nnet
+│   │       ├── keras_to_cpp_minst_toy
 │   │       ├── makefile
 │   │       ├── sample_mnist_bin.dat
 │   │       └── sample_mnist.dat
@@ -114,3 +115,35 @@ $ qemu-system-aarch64 -machine virt -cpu cortex-a53 -machine type=virt \
 ## 3. The application must accept input files of 28x28 bytes containing MNIST handwritten digits and must output the predicted digit on the console and the execution time
 
 * Binary image reading is implemented in ```Utilities::read_from_binary_file()``` function in [Utilities.cpp](mnist_toy/src/Utilities.cpp). After the file reading 
+
+* Run the execution file:
+
+``` $ ./keras_to_cpp_minst_toy sample_mnist_bin.dat ```
+
+![ ](/readme_imgs/basic_execution.png)
+
+## 4. Demonstrate that you have actually run this application on an ARM CPU or in a simulator.
+
+### 4.1. Run results
+![ ](/readme_imgs/cpu_info.png)
+
+### 4.2. Modifible and fixed weights
+
+### 4.3. Double vs float speed difference
+
+### 4.4. Execution time changes in commits
+
+!!!!IMAGE!!!!
+
+## 5. Outline your ideas on improving this model in speed and accuracy
+**a. Speed**
+
+* We can use processors which has built in NPU
+* We can use SIMD and Floating-point support at matrix multiplication
+
+**b. Improve accuracy**
+
+* Use double instead of float
+* Generate validation set from the training set. With validation set, we can get the quality of our results, and we are able to detect overfitting.
+* Increase the data set size with image augmentation. We can use for example blurring, scaling, zooming, and sharpening etc.. With augmentation we can get more generalized results.
+* Use concolutional neural network for this image classification task to increase robustness. In this case, the neural network doesn’t focuse on the whole image, rather than only on image features. The Kaggle architecture is much more complex, but we can get 99.3% accuracy.
