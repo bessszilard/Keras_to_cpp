@@ -10,6 +10,7 @@
 #include <time.h>
 #include <stdexcept>
 #include <iostream>
+#include <algorithm>
 #include "NnLayer.h"
 
 using std::cout;
@@ -182,6 +183,11 @@ vector_2d NeuralNetwork::predict(const vector_2d &input) {
 		temp = layer->get_output(temp);
 	}
 	return temp;
+}
+
+int NeuralNetwork::classify(const vector_2d &input) {
+	vector_2d result  = predict(input);
+	return std::max_element(result.begin(), result.end()) - result.begin();
 }
 
 /*

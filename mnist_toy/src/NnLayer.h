@@ -76,6 +76,7 @@ public:
 
 	void load_weights(const std::string &input_fname);
 	void add_layer(NnLayer *layer);
+	int classify(const vector_2d &input);
 	vector_2d predict(const vector_2d &input);
 };
 

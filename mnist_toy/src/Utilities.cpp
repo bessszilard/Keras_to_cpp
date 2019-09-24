@@ -15,15 +15,12 @@ vector_2d Utilities::read_from_file(const std::string &fname) {
 	fin >> depth >> rows >> cols;
 
 	vector_3d data = vector_3d(depth, vector_2d(rows, vector_1d(cols)));
-//	data.reserve(depth * rows * cols);
 	for (int d = 0; d < depth; ++d) {
 		for (int r = 0; r < rows; ++r) {
 			char tmp_char;
 			fin >> tmp_char;
 			for (int n = 0; n < cols; ++n) {
 				fin >> data[d][r][n];
-//				if(0.0 < data[d][r][n])
-//					std::cout << "[" << r << "," << n << "]" << "\t=" << (int)(data[d][r][n]*256) << std::endl;
 			}
 			fin >> tmp_char;
 		}
@@ -48,11 +45,11 @@ vector_2d Utilities::read_from_binary_file(const std::string &fname) {
 	binFile.seekg(0, std::ios::beg);
 	vector_2d data = vector_2d(rows, vector_1d(cols));
 	unsigned char array[28][28];
-	binFile.read((char*)&array, 28*28);
+	binFile.read((char*)&array, 28*28);						// copy the whole file content into 28x28 array
 
 	for (int r = 0; r < rows; ++r) {
 		for (int n = 0; n < cols; ++n) {
-			data[r][n] = (nn_cal_type)(array[r][n]) / 256;
+			data[r][n] = (nn_cal_type)(array[r][n]) / 256;	// normalization
 		}
 	}
 
@@ -77,6 +74,7 @@ void Clocks::start_FileRead() {
 	m_clkFileRead.start = m_clkInit.end;
 }
 void Clocks::start_Prediction() {
+	//TODO combine start functions into one
 	m_clkFileRead.end = clock();
 	m_clkPrediction.start = m_clkFileRead.end;
 }

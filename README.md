@@ -6,10 +6,75 @@
 4. Demonstrate that you have actually run this application on an ARM CPU or in a simulator..
 5. Outline your ideas on improving this model in speed and accuracy
 
+## Project structure
+
+```
+├── mnist_toy
+│   ├── Debug
+│   │   ├── makefile
+│   │   ├── objects.mk
+│   │   ├── sources.mk
+│   │   └── src
+│   │       └── subdir.mk
+│   ├── dumped.nnet
+│   ├── nn_file_gen
+│   │   ├── h5_to_dumped_h.py
+│   │   ├── h5_to_dumped_nnet.py
+│   │   └── mnist_toy_model.ipynb
+│   ├── qemu
+│   │   ├── aarch64-linux-3.15rc2-buildroot.img
+│   │   └── qemu_shared
+│   │       ├── dumped.nnet
+│   │       ├── makefile
+│   │       ├── sample_mnist_bin.dat
+│   │       └── sample_mnist.dat
+│   ├── sample_mnist_bin.dat
+│   ├── sample_mnist.dat
+│   └── src
+│       ├── dumped.h
+│       ├── keras_to_cpp_minst_toy.cpp
+│       ├── NnLayer.cpp
+│       ├── NnLayer.h
+│       ├── nnVector.h
+│       ├── Utilities.cpp
+│       └── Utilities.h
+├── README.md
+└── README.pdf
+```
+# Summary
+
+
+
+
 ## 1. Implement the trained model for a Cortex A53 processor in C or C++. You can only use standard libraries.
 
-alma
+### 1.1. Generate JSON, and store weights
+```
+# store model
+with open('./my_nn_arch.json', 'w') as fout:
+    fout.write(model.to_json())
+model.save_weights('./my_nn_weights.h5', overwrite=True)
+```
+### 1.2. Generate plain text and header files
+```
+$ python h5_to_dumped_h.py -a my_nn_arch.json -w my_nn_weights.h5 -o ../dumped.nnet -v 1
+$ python h5_to_dumped_nnet.py -a my_nn_arch.json -w my_nn_weights.h5 -o ../src/dumped.h -v 1
+```
+### 1.3. Importing generated files
+The program can work in 2 modes, in *modifible* and *fixed* weights. In *modifible weights* mode, the program reads the neural network weights from an exteral .nnet file, which can be given as an argument in the command line. In this case, the neural network architure and weights is determined in the external file. The architecture and weight loading process is handeled in ```NeuralNetwork::load_weights()``` function in [NnLayer.cpp](mnist_toy/src/NnLayer.cpp) file. 
+In the fixed weights mode neural network architecture is created manually in [keras_to_cpp_minst_toy.cpp](mnist_toy/src/keras_to_cpp_minst_toy.cpp) file in the main function, and weights are save in [dumped.h](mnist_toy/src/dumped.h) file. The adventage of this solution, that the innitialization process can be more than 120x faster.
 
+### 1.4. Prediction
+The whole prediction is done in ```NeuralNetwork::predict()``` function in [NnLayer.cpp](mnist_toy/src/NnLayer.cpp). For the generalization output and the input is also a vector_2d variable. The classified number is the of the output vector's biggest element. 
+```
+vector_2d NeuralNetwork::predict(const vector_2d &input) {
+	vector_2d temp = input;
+	for(auto layer : m_layers) {
+		temp = layer->get_output(temp);
+	}
+	return temp;
+}
+```
 
 ## 2. Deliver the application as source code and build scripts and the resulting binary that can run in qemu simulator.
 
@@ -24,7 +89,7 @@ $ qemu-system-aarch64 -machine virt -cpu cortex-a53 -machine type=virt \
 --append "console=ttyAMA0"
 ```
 
-* Exit from Qemu console
+* Exit from Qemu console 
 ``` Ctrl-A X ```
 
 * Share “/home/szilard/qemu/bennee/qemu_shared” folder with Qemu virtual machine:
@@ -41,71 +106,11 @@ $ qemu-system-aarch64 -machine virt -cpu cortex-a53 -machine type=virt \
 
 ### 2.2. Cross compiling for Cortex A53
 * Compile a single file named helloworld.cpp
+
 ```$ arm-linux-gnueabi-g++ helloword.cpp -o helloword-arm-cpp -static```
-* Creating a build scripts
-```
-CC = arm-linux-gnueabi-g++
-# CC = g++
-CFLAGS = -std=c++11 -static
 
-keras_to_cpp_minst_toy: keras_to_cpp_minst_toy.o NnLayer.o
-	$(CC) keras_to_cpp_minst_toy.o NnLayer.o -o keras_to_cpp_minst_toy $(CFLAGS)
-
-keras_to_cpp_minst_toy.o: keras_to_cpp_minst_toy.cpp NnLayer.h
-	$(CC) -c keras_to_cpp_minst_toy.cpp $(CFLAGS)
-
-NnLayer.o: NnLayer.cpp NnLayer.h
-	$(CC) -c NnLayer.cpp $(CFLAGS)	
-	
-clean:
-	rm *.o keras_to_cpp_minst_toy
-```
+* [Build scripts file](mnist_toy/qemu/qemu_shared/makefile)
 
 ## 3. The application must accept input files of 28x28 bytes containing MNIST handwritten digits and must output the predicted digit on the console and the execution time
 
-* Write image to binary file in python:
-```
-# store one sample in text file
-with open("./sample_mnist.dat", "w") as fin:
-    fin.write("1 28 28\n")
-    a = x_train[3]
-    for b in a:
-        fin.write(str(b)+'\n')
-```
-
-* Read image from binary file in C++:
-```
-vector_1d read_1d_array(ifstream &fin, int cols) {
-	vector_1d arr;
-	arr.reserve(cols);
-	float tmp_float;
-	char tmp_char;
-	fin >> tmp_char;
-	for (int n = 0; n < cols; ++n) {
-		fin >> tmp_float;
-		arr.push_back(tmp_float);
-	}
-	fin >> tmp_char;
-	return arr;
-}
-
-void read_from_file(const std::string &fname) {
-	int m_depth, m_rows, m_cols;
-	ifstream fin(fname.c_str());
-	if(fin.fail())
-		throw std::invalid_argument( "can't open " + fname);
-	fin >> m_depth >> m_rows >> m_cols;
-	data.reserve(m_depth * m_rows * m_cols);
-
-	for (int d = 0; d < m_depth; ++d) {
-		vector_2d tmp_single_depth;
-		for (int r = 0; r < m_rows; ++r) {
-			vector_1d tmp_row = read_1d_array(fin, m_cols);
-			tmp_single_depth.push_back(tmp_row);
-		}
-		data.push_back(tmp_single_depth);
-	}
-	fin.close();
-}
-```
-* Execution output in Qemu simulator:
+* Binary image reading is implemented in ```Utilities::read_from_binary_file()``` function in [Utilities.cpp](mnist_toy/src/Utilities.cpp). After the file reading 
