@@ -54,7 +54,7 @@ private:
 
 private:
 	vector_2d activaction(const vector_2d &input);
-//	void dotprodWithRelu(int col, const vector_2d &input, float &output);
+	void dotprod(vector_2d &m_weights, int col, const vector_2d &input, nn_cal_type m_bias, std::string act_type, nn_cal_type &output);
 
 public:
 	Dense(const vector_2d &weights, const  vector_2d &bias, const std::string &a_type);

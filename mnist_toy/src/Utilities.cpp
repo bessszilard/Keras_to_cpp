@@ -7,14 +7,15 @@
 #include "Utilities.h"
 
 vector_1d Utilities::read_1d_array(ifstream &fin, int cols) {
-	vector_1d arr;
-	arr.reserve(cols);
-	float tmp_float;
+	vector_1d arr(cols);
+//	arr.reserve(cols);
+//	float tmp_float;
 	char tmp_char;
 	fin >> tmp_char;
 	for (int n = 0; n < cols; ++n) {
-		fin >> tmp_float;
-		arr.push_back(tmp_float);
+//		fin >> tmp_float;
+//		arr.push_back(tmp_float);
+		fin >> arr[n];
 	}
 	fin >> tmp_char;
 	return arr;
@@ -27,16 +28,19 @@ vector_2d Utilities::read_from_file(const std::string &fname) {
 		throw std::invalid_argument( "can't open " + fname);
 	fin >> m_depth >> m_rows >> m_cols;
 
-	vector_3d data;
+	vector_3d data = vector_3d(m_depth, vector_2d(m_rows, vector_1d(m_cols)));
 	data.reserve(m_depth * m_rows * m_cols);
 	for (int d = 0; d < m_depth; ++d) {
-		vector_2d tmp_single_depth;
 		for (int r = 0; r < m_rows; ++r) {
-			vector_1d tmp_row = read_1d_array(fin, m_cols);
-			tmp_single_depth.push_back(tmp_row);
+			char tmp_char;
+			fin >> tmp_char;
+			for (int n = 0; n < m_cols; ++n) {
+				fin >> data[d][r][n];
+			}
+			fin >> tmp_char;
 		}
-		data.push_back(tmp_single_depth);
 	}
+
 	fin.close();
 	return data[0];
 }
