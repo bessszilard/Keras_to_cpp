@@ -65,6 +65,7 @@ The output of the Dense layer is calculated with this formula:
 | ***Y - Layer output***             |                           |
 
 <center>  <code>y = σ( transpose(W) * X + transpose(B) )</code>  </center>
+
 ### 1.5. Prediction
 The whole prediction is done in ```NeuralNetwork::predict()``` function in [NnLayer.cpp](mnist_toy/src/NnLayer.cpp). For the generalization output and the input is also a vector_2d variable. The classified number is the of the output vector's biggest element. 
 ```c++
