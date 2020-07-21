@@ -1,10 +1,4 @@
 # **Toy** MNIST model
-## Task description
-1. Implement the trained model for a Cortex A53 processor in C or C++. You can only use standard libraries.
-2. Deliver the application as source code and build scripts and the resulting binary that can run in qemu simulator.
-3. The application must accept input files of 28x28 bytes containing MNIST handwritten digits and must output the predicted digit on the console and the execution time
-4. Demonstrate that you have actually run this application on an ARM CPU or in a simulator.
-5. Outline your ideas on improving this model in speed and accuracy
 
 ## Project structure
 
